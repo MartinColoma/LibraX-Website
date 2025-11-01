@@ -1,0 +1,716 @@
+/* ===========================================
+   Book Requests - MUJI Dashboard Integrated
+   =========================================== */
+
+:root {
+  --muji-red: #6d1f25;
+  --muji-brown: #7d5a44;
+  --muji-grey: #bfb8af;
+  --muji-ivory: #f5f3ee;
+  --muji-dark: #1f1f1f;
+}
+
+.book-requests-container {
+  background-color: var(--muji-ivory);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* === HEADER === */
+.book-requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.book-requests-header h2 {
+  color: var(--muji-red);
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.issue-book-btn {
+  background-color: var(--muji-brown);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.issue-book-btn:hover {
+  background-color: var(--muji-red);
+  transform: translateY(-1px);
+}
+
+/* === LOADING STATE === */
+.loading-spinner-container {
+  text-align: center;
+  padding: 40px;
+  color: var(--muji-dark);
+  font-size: 1rem;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--muji-grey);
+  border-top-color: var(--muji-red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: var(--muji-brown);
+  font-size: 1rem;
+}
+
+/* === DESKTOP TABLE STYLES === */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.book-requests-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 600px;
+}
+
+.book-requests-table th {
+  background-color: var(--muji-red);
+  color: var(--muji-ivory);
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.book-requests-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--muji-grey);
+  color: var(--muji-dark);
+  font-size: 0.9rem;
+}
+
+.book-requests-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.book-requests-table tbody tr:hover {
+  background-color: var(--muji-ivory);
+}
+
+/* === VIEW REQUEST BUTTON === */
+.view-request-btn {
+  background-color: var(--muji-red);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  white-space: nowrap;
+}
+
+.view-request-btn:hover {
+  background-color: var(--muji-brown);
+  transform: translateY(-1px);
+}
+
+/* === MOBILE CARD VIEW === */
+.mobile-cards {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.request-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.request-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: var(--muji-red);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  color: var(--muji-ivory);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--muji-ivory);
+}
+
+.card-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.card-label {
+  color: var(--muji-brown);
+  font-weight: 600;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.card-value {
+  color: var(--muji-dark);
+  font-size: 0.9rem;
+  text-align: right;
+  word-break: break-word;
+}
+
+.card-actions {
+  padding-top: 12px;
+  border-top: 1px solid var(--muji-ivory);
+}
+
+.card-actions .view-request-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.9rem;
+}
+
+/* === MODAL OVERLAY === */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+/* === MODAL CONTAINER === */
+.modal-container {
+  background-color: var(--muji-ivory);
+  border-radius: 12px;
+  max-width: 1000px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* === MODAL CLOSE BUTTON === */
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--muji-dark);
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+  padding: 8px;
+  z-index: 10;
+}
+
+.modal-close-btn:hover {
+  color: var(--muji-red);
+  transform: scale(1.1);
+}
+
+/* === MODAL CONTENT === */
+.modal-content {
+  padding: 32px;
+}
+
+.modal-title {
+  text-align: center;
+  color: var(--muji-red);
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 32px;
+  border-bottom: 2px solid var(--muji-brown);
+  padding-bottom: 12px;
+}
+
+/* === MEMBER DETAILS SECTION === */
+.member-details-section {
+  background-color: #d4c4b0;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.member-details-section h3 {
+  color: var(--muji-dark);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+}
+
+.member-details-box {
+  background-color: #e8dcc8;
+  border-radius: 8px;
+  padding: 24px;
+  border: 2px solid var(--muji-dark);
+}
+
+.member-details-box p {
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+  color: var(--muji-dark);
+}
+
+.member-details-box p:last-child {
+  margin-bottom: 0;
+}
+
+.member-details-box .label {
+  font-weight: 700;
+}
+
+.member-details-box .label-red {
+  font-weight: 700;
+  color: var(--muji-red);
+}
+
+/* === BOOKS TO RETURN SECTION === */
+.books-return-section {
+  background-color: #d4c4b0;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.books-return-section h3 {
+  color: var(--muji-dark);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+}
+
+.book-details-box {
+  background-color: #e8dcc8;
+  border-radius: 8px;
+  padding: 24px;
+  border: 2px solid var(--muji-dark);
+}
+
+.book-label {
+  font-size: 0.85rem;
+  color: var(--muji-dark);
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+.book-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--muji-red);
+  margin-bottom: 16px;
+}
+
+.book-details-box p {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+  color: var(--muji-dark);
+}
+
+.book-details-box .label {
+  font-weight: 600;
+  color: var(--muji-brown);
+}
+
+/* === STATUS BADGE === */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.status-badge.pending {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.status-badge.approved {
+  background-color: #10b981;
+  color: white;
+}
+
+.status-badge.rejected {
+  background-color: #ef4444;
+  color: white;
+}
+
+.status-badge.completed {
+  background-color: var(--muji-brown);
+  color: white;
+}
+
+/* === DATE DETAILS SECTION === */
+.date-details-section {
+  background-color: #d4c4b0;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.date-row {
+  background-color: #e8dcc8;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 2px solid var(--muji-dark);
+}
+
+.date-row:last-child {
+  margin-bottom: 0;
+}
+
+.date-row.editable {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.date-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.date-label {
+  font-weight: 700;
+  color: var(--muji-brown);
+  font-size: 0.95rem;
+}
+
+.date-value {
+  font-size: 1.1rem;
+  color: var(--muji-dark);
+  font-weight: 600;
+}
+
+.date-input {
+  padding: 10px 12px;
+  border: 2px solid var(--muji-grey);
+  border-radius: 6px;
+  background-color: white;
+  color: var(--muji-dark);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: border-color 0.2s ease;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: var(--muji-brown);
+}
+
+.update-date-btn {
+  background-color: var(--muji-red);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  height: fit-content;
+}
+
+.update-date-btn:hover:not(:disabled) {
+  background-color: var(--muji-brown);
+}
+
+.update-date-btn:disabled {
+  background-color: var(--muji-grey);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* === REMARKS SECTION === */
+.remarks-section {
+  background-color: #d4c4b0;
+  border-radius: 10px;
+  padding: 24px;
+}
+
+.remarks-section h4 {
+  color: var(--muji-dark);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+
+.remarks-section p {
+  background-color: #e8dcc8;
+  border-radius: 8px;
+  padding: 16px;
+  border: 2px solid var(--muji-dark);
+  color: var(--muji-dark);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* === TABLET RESPONSIVE === */
+@media (max-width: 1024px) {
+  .book-requests-container {
+    padding: 16px;
+  }
+
+  .book-requests-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .book-requests-table {
+    font-size: 0.85rem;
+  }
+
+  .book-requests-table th,
+  .book-requests-table td {
+    padding: 10px;
+  }
+}
+
+/* === MOBILE RESPONSIVE === */
+@media (max-width: 768px) {
+  .book-requests-container {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .book-requests-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .book-requests-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .issue-book-btn {
+    width: 100%;
+  }
+
+  /* Hide table, show cards */
+  .table-wrapper {
+    display: none;
+  }
+
+  .mobile-cards {
+    display: flex;
+  }
+
+  .loading-spinner-container,
+  .no-data {
+    padding: 30px 16px;
+    font-size: 0.95rem;
+  }
+
+  /* Modal adjustments */
+  .modal-content {
+    padding: 20px;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .member-details-section,
+  .books-return-section,
+  .date-details-section,
+  .remarks-section {
+    padding: 16px;
+  }
+
+  .member-details-box,
+  .book-details-box,
+  .date-row {
+    padding: 16px;
+  }
+
+  .book-title {
+    font-size: 1.4rem;
+  }
+
+  .date-row.editable {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .update-date-btn {
+    width: 100%;
+    margin-top: 12px;
+  }
+}
+
+/* === EXTRA SMALL MOBILE === */
+@media (max-width: 480px) {
+  .book-requests-container {
+    padding: 10px;
+  }
+
+  .book-requests-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .mobile-cards {
+    gap: 12px;
+  }
+
+  .request-card {
+    border-radius: 8px;
+  }
+
+  .card-header {
+    padding: 10px 14px;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+  }
+
+  .card-body {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .card-row {
+    padding-bottom: 10px;
+  }
+
+  .card-label {
+    font-size: 0.8rem;
+    min-width: 70px;
+  }
+
+  .card-value {
+    font-size: 0.85rem;
+  }
+
+  .view-request-btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
+
+  .modal-content {
+    padding: 16px;
+  }
+
+  .member-details-section,
+  .books-return-section {
+    padding: 12px;
+  }
+
+  .member-details-box,
+  .book-details-box,
+  .return-date-section {
+    padding: 12px;
+  }
+}
+
+/* === LANDSCAPE MOBILE === */
+@media (max-width: 896px) and (orientation: landscape) {
+  .table-wrapper {
+    display: block;
+  }
+
+  .mobile-cards {
+    display: none;
+  }
+
+  .book-requests-table {
+    min-width: 500px;
+  }
+
+  .book-requests-table th,
+  .book-requests-table td {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+}
+
+/* === PRINT STYLES === */
+@media print {
+  .book-requests-container {
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .mobile-cards {
+    display: none;
+  }
+
+  .table-wrapper {
+    display: block;
+  }
+
+  .book-requests-table {
+    border: 1px solid #ddd;
+  }
+
+  .request-card:active {
+    transform: none;
+  }
+
+  .issue-book-btn,
+  .view-request-btn {
+    display: none;
+  }
+}

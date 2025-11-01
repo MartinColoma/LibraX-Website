@@ -78,7 +78,7 @@ const Overview: React.FC = () => {
 
   return (
     <div className="overview-container">
-      <h2>Recent User Accounts</h2>
+      <h2>Recently Created User Accounts</h2>
       {users.length === 0 ? (
         <p className="no-data">No users found.</p>
       ) : (

@@ -6,6 +6,7 @@ import Sidebar from "../Sidebar/Lib_Sidebar";
 import Overview from "./QuickActions/Overview/Overview";
 import Register from "./QuickActions/Register/Register";
 import NewBooks from "./QuickActions/NewBooks/NewBooks";
+import Request from "./QuickActions/BookRequest/BookRequest";
 
 const LibrarianDashboard: React.FC = () => {
   usePageMeta("User Dashboard - Home", "/LibraX Square Logo 1.png");
@@ -210,6 +211,9 @@ const LibrarianDashboard: React.FC = () => {
               <NewBooks /> // 👈 Here’s the integration
             ) : activeQuickAction === "registerMember" ? (
               <Register />
+            ) :
+              activeQuickAction === "bookRequest" ? (
+              <Request />
             ) : (
               <p>Content for <strong>{activeQuickAction}</strong> goes here.</p>
             )}

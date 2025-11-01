@@ -156,8 +156,8 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("https://librax-website-frontend.onrender.com/api/register", {
-        method: "POST",
+      const res = await fetch("https://librax-website-frontend.onrender.com/api/register", { // http://localhost:10000 for local testing
+        method: "POST", 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });

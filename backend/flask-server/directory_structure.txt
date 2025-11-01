@@ -1,5 +1,6 @@
 LibraX
 ├── api
+│   ├── .env
 │   ├── Dashboard
 │   │   ├── Librarian
 │   │   └── User
@@ -10,6 +11,7 @@ LibraX
 │       ├── auth.js
 │       ├── librarian
 │       │   └── quick_actions
+│       │       ├── bookrequests.js
 │       │       ├── newbooks.js
 │       │       └── overview.js
 │       ├── registration.js
@@ -60,7 +62,9 @@ LibraX
 │   │   │   │   │   │   └── QuickActions
 │   │   │   │   │   │       ├── BookRequest
 │   │   │   │   │   │       │   ├── BookRequest.css
-│   │   │   │   │   │       │   └── BookRequest.tsx
+│   │   │   │   │   │       │   ├── BookRequest.tsx
+│   │   │   │   │   │       │   ├── RequestDetails.module.css
+│   │   │   │   │   │       │   └── RequestDetails.tsx
 │   │   │   │   │   │       ├── NewBooks
 │   │   │   │   │   │       │   ├── NewBooks.css
 │   │   │   │   │   │       │   └── NewBooks.tsx
@@ -100,6 +104,8 @@ LibraX
 │   │   │   └── Popup
 │   │   │       ├── Popup.module.css
 │   │   │       └── Popup.tsx
+│   │   ├── types
+│   │   │   └── marcjs.d.ts
 │   │   └── utils
 │   │       └── supabaseClient.ts
 │   ├── tsconfig.app.json

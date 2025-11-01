@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./NewBooks.css";
-import { Loader2, Plus, X, ChevronDown } from "lucide-react"; //Upload
+import { Loader2, Plus, X, ChevronDown } from "lucide-react";
 import usePageMeta from "../../../../../../hooks/usePageMeta";
 
 const NewBooks: React.FC = () => {
@@ -31,7 +31,7 @@ const NewBooks: React.FC = () => {
   });
   const [authors, setAuthors] = useState<string[]>([""]);
 
-  // === MARC METADATA (for display purposes) ===
+  // === MARC METADATA ===
   const [marcMetadata, setMarcMetadata] = useState<{
     lcClassification?: string;
     deweyClassification?: string;
@@ -39,8 +39,9 @@ const NewBooks: React.FC = () => {
     series?: string;
   }>({});
 
-  // === NFC STATES ===
+  // === ENHANCED NFC STATES ===
   const [nfcSupported, setNfcSupported] = useState(false);
+  const [usbNFCMode, setUsbNFCMode] = useState(false);
   const [nfcReading, setNfcReading] = useState(false);
   const [nfcMessage, setNfcMessage] = useState("");
   const [scannedUIDs, setScannedUIDs] = useState<string[]>([]);
@@ -71,6 +72,14 @@ const NewBooks: React.FC = () => {
     if (!code) return "";
     const lowerCode = code.toLowerCase().trim();
     return languageMap[lowerCode] || code;
+  };
+
+  // === UTILITY: Convert USB decimal UID to colon-separated hex ===
+  const convertDecimalUidToHex = (decimalUid: string | number): string => {
+    let num = typeof decimalUid === "string" ? parseInt(decimalUid, 10) : decimalUid;
+    let hex = num.toString(16).padStart(8, "0");
+    hex = hex.match(/../g)?.reverse().join("") || hex;
+    return hex.match(/../g)?.join(":") || hex;
   };
 
   // === FETCH AUTHORS ===
@@ -117,30 +126,74 @@ const NewBooks: React.FC = () => {
     }
   }, [book.categoryType, categories]);
 
-  // === CHECK NFC SUPPORT ===
+  // === DETECT NFC / USB NFC MODE ===
   useEffect(() => {
     const checkNFCSupport = async () => {
-      if ("NDEFReader" in window) {
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      if ("NDEFReader" in window && isMobile) {
         try {
           const permission = await navigator.permissions.query({ name: "nfc" as any });
           setNfcSupported(permission.state !== "denied");
+          setUsbNFCMode(false);
+          console.log("✅ Native NFC (Web NFC API) is supported on mobile");
         } catch {
           setNfcSupported(false);
+          setUsbNFCMode(false);
         }
       } else {
+        setUsbNFCMode(true);
         setNfcSupported(false);
+        console.log("🖥️ USB NFC Reader mode enabled");
       }
     };
     checkNFCSupport();
   }, []);
 
+  // === GLOBAL USB NFC LISTENER (only when on step 4 and scanning) ===
+  useEffect(() => {
+    if (!usbNFCMode || step !== 4 || !nfcReading) return;
+
+    let buffer = "";
+    const handleGlobalKey = (e: KeyboardEvent) => {
+      // NFC reader usually ends with Enter
+      if (e.key === "Enter") {
+        if (buffer.trim()) {
+          const nfcDataHex = convertDecimalUidToHex(buffer.trim());
+          
+          if (!scannedUIDs.includes(nfcDataHex)) {
+            setScannedUIDs((prev) => [...prev, nfcDataHex]);
+            setNfcMessage(`✅ USB NFC Reader: ${nfcDataHex}`);
+          } else {
+            setNfcMessage(`⚠️ Duplicate NFC UID: ${nfcDataHex}`);
+          }
+        }
+        buffer = "";
+        e.preventDefault();
+      } else if (e.key.length === 1) {
+        buffer += e.key;
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKey);
+    return () => window.removeEventListener("keydown", handleGlobalKey);
+  }, [usbNFCMode, step, nfcReading, scannedUIDs]);
+
   // === NFC HANDLERS ===
   const startNFCReading = async () => {
-    if (!nfcSupported) {
-      alert("Native NFC not supported. Use USB reader instead.");
+    setNfcReading(true);
+    
+    // USB NFC Mode - just wait for keyboard input
+    if (usbNFCMode) {
+      setNfcMessage("🖥️ USB NFC Reader Mode: Hold book copy near the reader...");
       return;
     }
-    setNfcReading(true);
+
+    // Native NFC Mode
+    if (!nfcSupported) {
+      setNfcMessage("❌ Native NFC not supported. Using USB reader mode if available.");
+      return;
+    }
+
     setNfcMessage("📱 Waiting for NFC tag... Hold card near device.");
     nfcAbortControllerRef.current = new AbortController();
 
@@ -185,6 +238,12 @@ const NewBooks: React.FC = () => {
   const stopNFCReading = () => {
     if (nfcAbortControllerRef.current) nfcAbortControllerRef.current.abort();
     setNfcReading(false);
+    setNfcMessage("");
+  };
+
+  const removeScannedUID = (index: number) => {
+    setScannedUIDs(scannedUIDs.filter((_, i) => i !== index));
+    setNfcMessage("Tag removed from list");
   };
 
   // === FORM HANDLERS ===
@@ -222,6 +281,7 @@ const NewBooks: React.FC = () => {
     setScannedUIDs([]);
     setNfcMessage("");
     setMarcMetadata({});
+    stopNFCReading();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -269,184 +329,156 @@ const NewBooks: React.FC = () => {
     }
   };
 
- // const handleMarcButtonClick = () => marcInputRef.current?.click();
+  const handleMarcFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-const handleMarcFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+    const validExtensions = ['.mrc', '.marc', '.dat', '.bin'];
+    const fileName = file.name.toLowerCase();
+    const hasValidExt = validExtensions.some(ext => fileName.endsWith(ext));
+    
+    if (!hasValidExt) {
+      const proceed = window.confirm(
+        `The file "${file.name}" doesn't have a standard MARC extension (.mrc, .marc).\n\n` +
+        `Do you want to try uploading it anyway?`
+      );
+      if (!proceed) {
+        if (marcInputRef.current) marcInputRef.current.value = "";
+        return;
+      }
+    }
 
-  // Validate file extension
-  const validExtensions = ['.mrc', '.marc', '.dat', '.bin'];
-  const fileName = file.name.toLowerCase();
-  const hasValidExt = validExtensions.some(ext => fileName.endsWith(ext));
-  
-  if (!hasValidExt) {
-    const proceed = window.confirm(
-      `The file "${file.name}" doesn't have a standard MARC extension (.mrc, .marc).\n\n` +
-      `Do you want to try uploading it anyway?`
-    );
-    if (!proceed) {
+    setLoading(true);
+    setMessage("📄 Uploading and parsing MARC file...");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      console.log("📤 Uploading MARC file:", file.name, `(${file.size} bytes)`);
+
+      const res = await fetch(
+        "https://librax-website-frontend.onrender.com/api/librarian/quick_actions/newbooks/marc",
+        { method: "POST", body: formData }
+      );
+
+      const data = await res.json();
+      
+      if (!res.ok) {
+        let errorMessage = data.message || "Failed to parse MARC file";
+        
+        if (data.hints && Array.isArray(data.hints)) {
+          errorMessage += "\n\n💡 Suggestions:\n" + data.hints.map((h: string) => `• ${h}`).join("\n");
+        } else if (data.hint) {
+          errorMessage += "\n\n💡 " + data.hint;
+        }
+        
+        if (data.details) {
+          console.error("MARC parsing details:", data.details);
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const record = data.records?.[0];
+      if (!record) {
+        throw new Error("No MARC record found in file");
+      }
+
+      console.log("📖 Received MARC record:", record);
+
+      const title = record.title?.trim() || "";
+      if (!title) {
+        throw new Error("MARC record contains no title. Please check the file.");
+      }
+
+      const subtitle = record.subtitle?.trim() || "";
+      const isbn = record.isbn?.trim() || "";
+      const publisher = record.publisher?.trim() || "";
+
+      let formattedYear = "";
+      if (record.publicationYear) {
+        const year = record.publicationYear.match(/\d{4}/)?.[0];
+        if (year) {
+          formattedYear = `${year}-01-01`;
+        }
+      }
+
+      const edition = record.edition?.trim() || "";
+      const languageCode = record.language?.trim() || "";
+      const language = mapLanguageCode(languageCode);
+      const description = record.description?.trim() || "";
+
+      let marcAuthors = record.authors || [];
+      marcAuthors = marcAuthors.filter((a: string) => {
+        const cleaned = a.trim();
+        return cleaned !== "" && cleaned.toLowerCase() !== "unknown author";
+      });
+
+      if (marcAuthors.length === 0) {
+        marcAuthors = [""];
+      }
+
+      console.log("✅ Extracted data:");
+      console.log("  Title:", title);
+      console.log("  Authors:", marcAuthors);
+      console.log("  Publisher:", publisher);
+      console.log("  Year:", record.publicationYear);
+      console.log("  ISBN:", isbn);
+      console.log("  Language:", language);
+
+      setBook({
+        title,
+        subtitle,
+        isbn,
+        publisher,
+        publicationYear: formattedYear,
+        edition,
+        language,
+        description,
+        category: "",
+        categoryType: "",
+        copies: "1",
+      });
+
+      setAuthors(marcAuthors);
+
+      setMarcMetadata({
+        lcClassification: record.lcClassification,
+        deweyClassification: record.deweyClassification,
+        subject: record.subject,
+        series: record.series,
+      });
+
+      const summary = [
+        title,
+        marcAuthors.length > 0 && marcAuthors[0] ? `by ${marcAuthors.join(", ")}` : "",
+        publisher ? `(${publisher})` : "",
+        record.publicationYear || ""
+      ].filter(Boolean).join(" ");
+
+      setMessage(`✅ MARC file parsed successfully!\n\n${summary}\n\nPlease verify the data and select a category.`);
+      
+    } catch (err: any) {
+      console.error("❌ MARC upload error:", err);
+      
+      const errorLines = err.message.split("\n");
+      const mainError = errorLines[0];
+      const details = errorLines.slice(1).join("\n");
+      
+      setMessage(`❌ ${mainError}`);
+      
+      if (details) {
+        setTimeout(() => {
+          alert(`MARC Upload Failed\n\n${mainError}\n${details}`);
+        }, 100);
+      }
+      
+    } finally {
+      setLoading(false);
       if (marcInputRef.current) marcInputRef.current.value = "";
-      return;
     }
-  }
-
-  setLoading(true);
-  setMessage("📄 Uploading and parsing MARC file...");
-
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    console.log("📤 Uploading MARC file:", file.name, `(${file.size} bytes)`);
-
-    const res = await fetch(
-      "https://librax-website-frontend.onrender.com/api/librarian/quick_actions/newbooks/marc",
-      { method: "POST", body: formData }
-    );
-
-    const data = await res.json();
-    
-    if (!res.ok) {
-      // Handle specific error cases with helpful messages
-      let errorMessage = data.message || "Failed to parse MARC file";
-      
-      if (data.hints && Array.isArray(data.hints)) {
-        errorMessage += "\n\n💡 Suggestions:\n" + data.hints.map((h: string) => `• ${h}`).join("\n");
-      } else if (data.hint) {
-        errorMessage += "\n\n💡 " + data.hint;
-      }
-      
-      if (data.details) {
-        console.error("MARC parsing details:", data.details);
-      }
-      
-      throw new Error(errorMessage);
-    }
-
-    const record = data.records?.[0];
-    if (!record) {
-      throw new Error("No MARC record found in file");
-    }
-
-    console.log("📖 Received MARC record:", record);
-
-    // === Extract and validate data ===
-    
-    // Title (required)
-    const title = record.title?.trim() || "";
-    if (!title) {
-      throw new Error("MARC record contains no title. Please check the file.");
-    }
-
-    // Subtitle
-    const subtitle = record.subtitle?.trim() || "";
-
-    // ISBN - clean it up
-    const isbn = record.isbn?.trim() || "";
-
-    // Publisher - clean trailing punctuation
-    const publisher = record.publisher?.trim() || "";
-
-    // Publication year - format for date input
-    let formattedYear = "";
-    if (record.publicationYear) {
-      const year = record.publicationYear.match(/\d{4}/)?.[0];
-      if (year) {
-        formattedYear = `${year}-01-01`; // Format as YYYY-MM-DD for date input
-      }
-    }
-
-    // Edition
-    const edition = record.edition?.trim() || "";
-
-    // Language - map code to full name
-    const languageCode = record.language?.trim() || "";
-    const language = mapLanguageCode(languageCode);
-
-    // Description - use summary, notes, or physical description
-    const description = record.description?.trim() || "";
-
-    // Authors - filter out "Unknown Author" and empty strings
-    let marcAuthors = record.authors || [];
-    
-    // Remove "Unknown Author" placeholder
-    marcAuthors = marcAuthors.filter((a: string) => {
-      const cleaned = a.trim();
-      return cleaned !== "" && cleaned.toLowerCase() !== "unknown author";
-    });
-
-    // If no authors found, start with one empty field
-    if (marcAuthors.length === 0) {
-      marcAuthors = [""];
-    }
-
-    console.log("✅ Extracted data:");
-    console.log("  Title:", title);
-    console.log("  Authors:", marcAuthors);
-    console.log("  Publisher:", publisher);
-    console.log("  Year:", record.publicationYear);
-    console.log("  ISBN:", isbn);
-    console.log("  Language:", language);
-
-    // === Update form with MARC data ===
-    setBook({
-      title,
-      subtitle,
-      isbn,
-      publisher,
-      publicationYear: formattedYear,
-      edition,
-      language,
-      description,
-      category: "",
-      categoryType: "",
-      copies: "1",
-    });
-
-    // === Set authors ===
-    setAuthors(marcAuthors);
-
-    // === Store MARC metadata for reference ===
-    setMarcMetadata({
-      lcClassification: record.lcClassification,
-      deweyClassification: record.deweyClassification,
-      subject: record.subject,
-      series: record.series,
-    });
-
-    // === Success message with summary ===
-    const summary = [
-      title,
-      marcAuthors.length > 0 && marcAuthors[0] ? `by ${marcAuthors.join(", ")}` : "",
-      publisher ? `(${publisher})` : "",
-      record.publicationYear || ""
-    ].filter(Boolean).join(" ");
-
-    setMessage(`✅ MARC file parsed successfully!\n\n${summary}\n\nPlease verify the data and select a category.`);
-    
-  } catch (err: any) {
-    console.error("❌ MARC upload error:", err);
-    
-    // Format error message for display
-    const errorLines = err.message.split("\n");
-    const mainError = errorLines[0];
-    const details = errorLines.slice(1).join("\n");
-    
-    setMessage(`❌ ${mainError}`);
-    
-    // Show detailed error in alert if available
-    if (details) {
-      setTimeout(() => {
-        alert(`MARC Upload Failed\n\n${mainError}\n${details}`);
-      }, 100);
-    }
-    
-  } finally {
-    setLoading(false);
-    if (marcInputRef.current) marcInputRef.current.value = "";
-  }
-};
+  };
 
   const totalCopies = Number(book.copies) || scannedUIDs.length;
   const allCopiesScanned = scannedUIDs.length >= totalCopies;
@@ -459,9 +491,6 @@ const handleMarcFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
           <>
             <div className="form-header">
               <h2>Add New Book</h2>
-              {/* <button type="button" className="marc-upload-btn" onClick={handleMarcButtonClick}>
-                MARC Upload <Upload size={16} />
-              </button> */}
               <input
                 type="file"
                 ref={marcInputRef}
@@ -471,7 +500,6 @@ const handleMarcFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
               />
             </div>
 
-            {/* Display MARC metadata if available */}
             {(marcMetadata.lcClassification || marcMetadata.deweyClassification || marcMetadata.subject) && (
               <div style={{ 
                 background: "#f0f9ff", 
@@ -696,32 +724,112 @@ const handleMarcFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         return (
           <>
             <h2>Scan NFC Tags</h2>
-            <p>Total Copies to Scan: {book.copies || "N/A"}</p>
-            <div className="nfc-section">
-              <h3>📱 NFC Scanner</h3>
+            <p style={{ marginBottom: "16px", color: "#666" }}>
+              Total Copies to Scan: <strong>{book.copies || "N/A"}</strong>
+            </p>
+            
+            <div className="nfc-section" style={{ border: "2px solid #667eea", borderRadius: "8px", padding: "20px" }}>
+              <h3 style={{ marginBottom: "12px" }}>
+                {nfcSupported ? "📱 Mobile NFC Scanner" : "🖥️ USB NFC Reader"}
+              </h3>
 
               {nfcSupported ? (
                 <button
                   type="button"
                   onClick={nfcReading ? stopNFCReading : startNFCReading}
                   className="nfc-btn"
+                  style={{
+                    background: nfcReading ? "#dc3545" : "#667eea",
+                    marginBottom: "12px"
+                  }}
                 >
                   {nfcReading ? "🛑 Stop NFC Reading" : "📱 Start NFC Reading"}
                 </button>
+              ) : usbNFCMode ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={nfcReading ? stopNFCReading : startNFCReading}
+                    className="nfc-btn"
+                    style={{
+                      background: nfcReading ? "#dc3545" : "#667eea",
+                      marginBottom: "12px"
+                    }}
+                  >
+                    {nfcReading ? "🛑 Stop USB Reading" : "🖥️ Start USB Reading"}
+                  </button>
+                  {!nfcReading && (
+                    <p style={{ fontSize: "0.9em", color: "#666", marginBottom: "12px" }}>
+                      💡 Click the button above, then position the USB NFC reader near each book copy
+                    </p>
+                  )}
+                </>
               ) : (
-                <p>NFC not supported on this device.</p>
+                <p style={{ color: "#dc3545" }}>❌ NFC not supported on this device.</p>
               )}
 
-              <p className="nfc-message">
+              <p className="nfc-message" style={{ 
+                fontWeight: "600", 
+                color: scannedUIDs.length >= totalCopies ? "#28a745" : "#856404",
+                marginBottom: "8px"
+              }}>
                 Scanned Copies: {scannedUIDs.length} / {book.copies || "N/A"}
               </p>
-              {nfcMessage && <p className="nfc-message">{nfcMessage}</p>}
+              
+              {nfcMessage && (
+                <p className="nfc-message" style={{ 
+                  marginBottom: "12px",
+                  padding: "8px 12px",
+                  background: nfcMessage.includes("✅") ? "#d4edda" : nfcMessage.includes("⚠️") ? "#fff3cd" : "#f8d7da",
+                  borderRadius: "6px",
+                  color: nfcMessage.includes("✅") ? "#155724" : nfcMessage.includes("⚠️") ? "#856404" : "#721c24"
+                }}>
+                  {nfcMessage}
+                </p>
+              )}
 
-              <ul className="nfc-uid-list">
-                {scannedUIDs.map((uid, i) => (
-                  <li key={i}>{uid}</li>
-                ))}
-              </ul>
+              {scannedUIDs.length > 0 && (
+                <div style={{ marginTop: "16px" }}>
+                  <h4 style={{ marginBottom: "8px", fontSize: "0.95em" }}>Scanned UIDs:</h4>
+                  <ul className="nfc-uid-list" style={{ 
+                    listStyle: "none", 
+                    padding: "0", 
+                    maxHeight: "200px", 
+                    overflowY: "auto" 
+                  }}>
+                    {scannedUIDs.map((uid, i) => (
+                      <li key={i} style={{ 
+                        display: "flex", 
+                        justifyContent: "space-between", 
+                        alignItems: "center",
+                        padding: "8px 12px",
+                        background: "#f8f9fa",
+                        marginBottom: "4px",
+                        borderRadius: "4px",
+                        fontFamily: "monospace",
+                        fontSize: "0.9em"
+                      }}>
+                        <span>#{i + 1}: {uid}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeScannedUID(i)}
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            color: "#dc3545",
+                            cursor: "pointer",
+                            padding: "4px 8px",
+                            fontSize: "1.1em"
+                          }}
+                          title="Remove this UID"
+                        >
+                          <X size={16} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </>
         );
@@ -769,6 +877,7 @@ const handleMarcFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
               type="submit"
               className="add-btn"
               disabled={loading || !allCopiesScanned}
+              title={!allCopiesScanned ? `Please scan all ${book.copies} copies` : "Submit book"}
             >
               {loading ? <Loader2 className="spin" size={20} /> : "Add Book"}
             </button>
@@ -823,6 +932,21 @@ const handleMarcFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         <p>
           <strong>Description:</strong> {book.description || "[Description of the book]"}
         </p>
+        
+        {/* Show NFC Mode indicator */}
+        {step === 4 && (
+          <div style={{
+            marginTop: "16px",
+            padding: "12px",
+            background: "#e7f3ff",
+            borderRadius: "6px",
+            border: "2px solid #b3d9ff"
+          }}>
+            <p style={{ margin: 0, fontWeight: "600", color: "#004085" }}>
+              {nfcSupported ? "📱 Using Mobile NFC" : "🖥️ Using USB NFC Reader"}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
