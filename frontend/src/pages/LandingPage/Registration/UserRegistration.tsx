@@ -12,8 +12,6 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
     lastName: "",
     gender: "",
     birthday: "",
-    address: "",
-    phone: "",
     idNumber: "",
     email: "",
     nfcUid: "",
@@ -188,7 +186,7 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
                   <option value="">Select Membership Type</option>
                   <option value="Student">Student</option>
                   <option value="Faculty">Faculty</option>
-                  <option value="Librarian">Librarian</option>
+                  {/* <option value="Librarian">Librarian</option> */}
                 </select>
               </label>
             </div>
@@ -197,11 +195,11 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
             <div className={styles.row2}>
               <label>
                 First Name:
-                <input name="firstName" type="text" value={form.firstName} onChange={handleChange} required />
+                <input name="firstName" type="text" value={form.firstName} onChange={handleChange} required placeholder="Enter your first name"/>
               </label>
               <label>
                 Last Name:
-                <input name="lastName" type="text" value={form.lastName} onChange={handleChange} required />
+                <input name="lastName" type="text" value={form.lastName} onChange={handleChange} required placeholder="Enter your first name"/>
               </label>
             </div>
 
@@ -221,27 +219,15 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
               </label>
             </div>
 
-            {/* Address & Phone */}
-            <div className={styles.row2}>
-              <label>
-                Address:
-                <input name="address" type="text" value={form.address} onChange={handleChange} />
-              </label>
-              <label>
-                Phone Number:
-                <input name="phone" type="text" value={form.phone} onChange={handleChange} />
-              </label>
-            </div>
-
             {/* Email & ID */}
             <div className={styles.row2}>
               <label>
                 Email:
-                <input name="email" type="email" value={form.email} onChange={handleChange} required />
+                <input name="email" type="email" value={form.email} onChange={handleChange} required placeholder="Enter your institutional email"/>
               </label>
               <label>
                 Student/Faculty ID:
-                <input name="idNumber" type="text" value={form.idNumber} onChange={handleChange} required />
+                <input name="idNumber" type="text" value={form.idNumber} onChange={handleChange} required placeholder="Enter your student/faculty id number"/>
               </label>
             </div>
 

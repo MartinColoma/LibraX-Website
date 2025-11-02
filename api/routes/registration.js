@@ -35,8 +35,6 @@ module.exports = function registrationRoutes(app) {
         lastName,
         gender,
         birthday,
-        address,
-        phone,
         idNumber,
         email,
         nfcUid,
@@ -74,7 +72,7 @@ module.exports = function registrationRoutes(app) {
       const passwordHash = await bcrypt.hash(tempPassword, 10);
       const userType = getUserType(role);
 
-      // Insert to database
+      // Insert to database (removed address and phone_number)
       const { data, error } = await supabase
         .from("users")
         .insert([
@@ -86,9 +84,7 @@ module.exports = function registrationRoutes(app) {
             last_name: lastName,
             gender,
             birthday,
-            address,
             email,
-            phone_number: phone,
             student_faculty_id: idNumber,
             password_hash: passwordHash,
             nfc_uid: nfcUid || null,
@@ -100,7 +96,7 @@ module.exports = function registrationRoutes(app) {
 
       if (error) throw error;
 
-      // Call Vercel serverless function for email sending
+      // Call Vercel serverless function for email sending (removed address and phone)
       await fetch("https://libra-x-email.vercel.app/api/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -111,8 +107,6 @@ module.exports = function registrationRoutes(app) {
           role,
           gender,
           birthday,
-          address,
-          phone,
           idNumber,
           nfcUid,
           tempPassword,

@@ -3,9 +3,9 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
-  BookOpen,
+//  BookOpen,
   LayoutDashboard,
-  Bell,
+//  Bell,
   MoreHorizontal,
   Menu,
   X,
@@ -74,9 +74,9 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
 
   // ✅ Navigation items
   const navItems = [
-    { name: "Home", path: "/librarian/dashboard/home", icon: <LayoutDashboard size={18} /> },
-    { name: "Manage Users", path: "/member/dashboard/books", icon: <BookOpen size={18} /> },
-    { name: "Manage Books", path: "/member/dashboard/news", icon: <Bell size={18} /> },
+    { name: "Home", path: "/librarian/dashboard/home", icon: <LayoutDashboard size={18} /> }
+    // { name: "Manage Users", path: "/member/dashboard/books", icon: <BookOpen size={18} /> },
+    // { name: "Manage Books", path: "/member/dashboard/news", icon: <Bell size={18} /> },
   ];
 
   // ✅ Integrated backend logout logic
@@ -198,7 +198,7 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
             <div className="user-dropdown">
               {collapsed && <div className="dropdown-user">{username}</div>}
 
-              <button
+              {/* <button
                 className="dropdown-item"
                 onClick={() => {
                   setMenuOpen(false);
@@ -206,7 +206,7 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
                 }}
               >
                 Profile
-              </button>
+              </button> */}
 
               <button className="dropdown-item" onClick={handleLogout}>
                 Logout
