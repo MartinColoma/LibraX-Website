@@ -189,7 +189,6 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
                   <option value="">Select Membership Type</option>
                   <option value="Student">Student</option>
                   <option value="Faculty">Faculty</option>
-                  <option value="Librarian">Librarian</option>
                 </select>
               </label>
             </div>
