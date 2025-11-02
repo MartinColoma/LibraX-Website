@@ -34,7 +34,7 @@ export default function BookRequestsPage() {
 
   const fetchBookRequests = async () => {
     try {
-      const response = await fetch('http://localhost:10000/api/librarian/quick-actions/book-requests');
+      const response = await fetch('https://librax-website-frontend.onrender.com/api/librarian/quick-actions/book-requests');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
