@@ -170,6 +170,9 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
     }
   };
 
+  // Check if NFC card is scanned
+  const isNfcScanned = form.nfcUid.trim() !== "";
+
   return (
     <div className={styles.backdrop}>
       {loading && <div className={styles.loadingOverlay}></div>}
@@ -186,7 +189,7 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
                   <option value="">Select Membership Type</option>
                   <option value="Student">Student</option>
                   <option value="Faculty">Faculty</option>
-                  {/* <option value="Librarian">Librarian</option> */}
+                  <option value="Librarian">Librarian</option>
                 </select>
               </label>
             </div>
@@ -199,7 +202,7 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
               </label>
               <label>
                 Last Name:
-                <input name="lastName" type="text" value={form.lastName} onChange={handleChange} required placeholder="Enter your first name"/>
+                <input name="lastName" type="text" value={form.lastName} onChange={handleChange} required placeholder="Enter your last name"/>
               </label>
             </div>
 
@@ -236,7 +239,7 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
               <h3 className={styles.nfcTitle}>{nfcSupported ? "📱 Native NFC" : "🖥️ USB NFC Reader"}</h3>
 
               <label>
-                NFC Card UID (Optional):
+                NFC Card UID (Required):
                 <input
                   ref={nfcInputRef}
                   className={styles.nfcInput}
@@ -274,7 +277,15 @@ const UserRegistration: React.FC<Props> = ({ onClose }) => {
               <button type="button" className={styles.cancelBtn} onClick={onClose}>
                 Cancel
               </button>
-              <button type="submit" className={styles.createBtn}>
+              <button 
+                type="submit" 
+                className={styles.createBtn}
+                disabled={!isNfcScanned}
+                style={{
+                  opacity: isNfcScanned ? 1 : 0.5,
+                  cursor: isNfcScanned ? "pointer" : "not-allowed",
+                }}
+              >
                 Create Account
               </button>
             </div>
