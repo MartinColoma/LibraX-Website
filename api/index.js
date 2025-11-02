@@ -38,9 +38,14 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
 const authRoutes = require("./routes/auth");
 const registrationRoutes = require("./routes/registration");
 const verifyTokenRoutes = require("./routes/verify-token");
-const librarianOverviewRoutes = require("./routes/librarian/quick_actions/overview");
-const newBooksRoute = require("./routes/librarian/quick_actions/newbooks");
-const BookReqRoute = require("./routes/librarian/quick_actions/bookrequests");
+
+// Librarian
+const librarianOverviewRoutes = require("./routes/librarian/quick_actions/qa_overview");
+const librariannewBooksRoute = require("./routes/librarian/quick_actions/qa_newbooks");
+const librarianBookReqRoute = require("./routes/librarian/quick_actions/qa_bookrequests");
+
+// User (Merged Routes)
+const userRoutes = require("./routes/users/searchbooks/search_req");
 
 // =========================================
 // 🔹 Serve Static Files (Frontend Build)
@@ -64,12 +69,18 @@ registrationRoutes(app);
 console.log("✅ Registration routes mounted");
 verifyTokenRoutes(app);
 console.log("✅ Verify token routes mounted");
+
+// Librarian API Calls
 librarianOverviewRoutes(app);
 console.log("✅ Librarian overview routes mounted");
-newBooksRoute(app);
+librariannewBooksRoute(app);
 console.log("✅ New books routes mounted");
-BookReqRoute(app);
+librarianBookReqRoute(app);
 console.log("✅ Book request routes mounted");
+
+// User API Calls (Merged)
+userRoutes(app);
+console.log("✅ User routes mounted (search, verify-password, books/request)");
 
 // =========================================
 // 🔹 ROUTE DEBUGGER - Print All Registered Routes

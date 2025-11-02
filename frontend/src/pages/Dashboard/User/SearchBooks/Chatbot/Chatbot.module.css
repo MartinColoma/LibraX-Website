@@ -1,0 +1,159 @@
+.chatbotContainer {
+  width: 500px;
+  border: 2px solid #842f31;    /* Accent color */
+  border-radius: 12px;
+  position: fixed;
+  bottom: 20px;
+  right: 25px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(132, 47, 49, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  z-index: 998;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  background: #efdddd;
+  color: #320000;
+  padding: 12px 20px;
+  font-size: 1.12rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  border-bottom: 3px solid #842f31;
+  cursor: pointer;
+  user-select: none;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.arrow {
+  font-size: 1.3em;
+}
+
+.chatBody {
+  display: flex;
+  flex-direction: column;
+  height: 700px;
+  background: #fefefe;
+  padding: 16px 12px;
+  flex: 1;
+}
+
+.messagesArea {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  scroll-behavior: smooth;
+}
+
+/* Bubble styles */
+.botBubble {
+  align-self: flex-start;
+  background: #fff;
+  border: 2px solid #320000;
+  border-radius: 16px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  color: #222;
+  max-width: 80%;
+  box-shadow: 0 2px 7px rgba(50, 0, 0, 0.1);
+}
+
+.userBubble {
+  align-self: flex-end;
+  background: #e6f3fb;
+  border: 2px solid #54b1ff;
+  border-radius: 16px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  color: #123;
+  max-width: 80%;
+  box-shadow: 0 2px 7px rgba(84, 177, 255, 0.3);
+}
+
+.inputArea {
+  display: flex;
+  border-top: 2px solid #842f31;
+  padding-top: 10px;
+  gap: 8px;
+  align-items: center;
+  background-color: #fafafa;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.inputBox {
+  flex: 1;
+  font-size: 1.1rem;
+  border: 2px solid #bbb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.inputBox:focus {
+  border-color: #842f31;
+}
+
+.sendBtn {
+  background: #842f31;
+  border: none;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 10px 18px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 1.1rem;
+  transition: background 0.25s ease;
+}
+
+.sendBtn:hover {
+  background: #a03b3c;
+}
+
+/* Typing animation */
+.typing {
+  display: inline-flex;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #320000;
+}
+
+.typing span {
+  animation-name: blink;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 1.4s;
+}
+
+.typing span:nth-child(1) {
+  animation-delay: 0s;
+}
+.typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%, 20% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}

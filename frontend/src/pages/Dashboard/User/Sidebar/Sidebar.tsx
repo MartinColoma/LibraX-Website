@@ -3,12 +3,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
-  BookOpen,
+//  BookOpen,
   LayoutDashboard,
   Bell,
   MoreHorizontal,
   Menu,
   X,
+  SearchCheck,
 } from "lucide-react";
 import axios from "axios";
 import "./Sidebar.css";
@@ -75,8 +76,8 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
   // ✅ Navigation items
   const navItems = [
     { name: "Home", path: "/user/dashboard/home", icon: <LayoutDashboard size={18} /> },
-    { name: "My Books", path: "/member/dashboard/books", icon: <BookOpen size={18} /> },
-    { name: "Library News", path: "/member/dashboard/news", icon: <Bell size={18} /> },
+    { name: "Search Books", path: "/user/dashboard/search-books", icon: <SearchCheck size={18} /> },
+    { name: "Book Requests", path: "/member/dashboard/news", icon: <Bell size={18} /> },
   ];
 
   // ✅ Integrated backend logout logic
@@ -198,7 +199,7 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
             <div className="user-dropdown">
               {collapsed && <div className="dropdown-user">{username}</div>}
 
-              <button
+              {/* <button
                 className="dropdown-item"
                 onClick={() => {
                   setMenuOpen(false);
@@ -206,7 +207,7 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
                 }}
               >
                 Profile
-              </button>
+              </button> */}
 
               <button className="dropdown-item" onClick={handleLogout}>
                 Logout

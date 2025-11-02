@@ -13,6 +13,7 @@ import LibHome from "./pages/Dashboard/Librarian/Home/Lib_Home";
 
 // User Pages
 import UserHome from "./pages/Dashboard/User/Home/User_Home";
+import UserSearch from "./pages/Dashboard/User/SearchBooks/SearchBooks";
 
 // Protected Route
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -84,6 +85,14 @@ const AppRoutes: React.FC = () => {
           element={
             <ProtectedRoute allowedUserTypes={["member"]}>
               <UserHome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user/dashboard/search-books"
+          element={
+            <ProtectedRoute allowedUserTypes={["member"]}>
+              <UserSearch />
             </ProtectedRoute>
           }
         />

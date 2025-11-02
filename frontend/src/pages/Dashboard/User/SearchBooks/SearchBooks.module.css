@@ -1,0 +1,491 @@
+.opacContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: linear-gradient(135deg, #f7f5f2 0%, #edeae6 100%);
+  font-family: 'Arial', sans-serif;
+  color: #2b2b2b;
+}
+
+/* MAIN CONTENT */
+.opacMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 3rem 1.25rem;
+  min-height: 100vh;
+}
+
+.pageTitle {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #7d2e2e;
+  margin-bottom: 3.75rem;
+  letter-spacing: -0.5px;
+  text-align: center;
+}
+
+/* SEARCH BAR */
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 56.25rem;
+}
+
+.searchDropdown {
+  padding: 0.875rem 1.125rem;
+  border-radius: 0.75rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  background-color: #fafafa;
+  cursor: pointer;
+  transition: border 0.2s ease;
+  min-width: 9.375rem;
+}
+
+.searchDropdown:focus {
+  border-color: #7d2e2e;
+  outline: none;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.875rem 1.25rem;
+  border: 1px solid #ccc;
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+.searchInput:focus {
+  border-color: #7d2e2e;
+}
+
+.searchBtn {
+  background: #7d2e2e;
+  border: none;
+  color: white;
+  border-radius: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 5rem;
+}
+
+.searchBtn:hover {
+  background: #6b2525;
+  transform: translateY(-2px);
+}
+
+.searchHint {
+  margin-top: 2.5rem;
+  font-size: 1.125rem;
+  color: #666;
+  font-style: italic;
+  text-align: center;
+}
+
+/* RESULTS SECTION */
+.resultsContainer {
+  margin-top: 2.5rem;
+  width: 90%;
+  max-width: 56.25rem;
+}
+
+.resultCount {
+  font-size: 1rem;
+  color: #3a1e1e;
+  margin-bottom: 1.25rem;
+  font-weight: 600;
+}
+
+/* BOOK CARD */
+.bookCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #4a2b2b;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  background-color: #fffaf5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.bookDetails {
+  flex: 1;
+}
+
+.bookType {
+  font-size: 0.875rem;
+  color: #7d2e2e;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bookTitle {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #4a1e1e;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.bookMeta {
+  font-size: 1rem;
+  color: #3a1e1e;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.available {
+  font-size: 1rem;
+  color: #2d7a2d;
+  font-weight: 600;
+}
+
+.notAvailable {
+  font-size: 1rem;
+  color: #a12e2e;
+  font-weight: 600;
+}
+
+/* ACTION BUTTON */
+.bookAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1.5rem;
+}
+
+.requestBtn {
+  background-color: #7d2e2e;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.requestBtn:hover:not(:disabled) {
+  background-color: #6b2525;
+}
+
+.disabledBtn {
+  background-color: #d1d1d1 !important;
+  cursor: not-allowed;
+}
+
+/* MODAL OVERLAY and MODAL POPUP */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(45, 24, 24, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #fffaf6;
+  border-radius: 1.125rem;
+  box-shadow: 0 10px 24px rgba(125, 46, 46, 0.15);
+  max-width: 35rem;
+  width: 90%;
+  padding: 2.25rem 2.125rem 1.5rem 2.125rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #7d2e2e;
+}
+
+.modalTitle {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: #7d2e2e;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Modal Content */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.section {
+  background: #f7f5f2;
+  border-radius: 0.625rem;
+  padding: 1.25rem 1.125rem;
+  box-shadow: 0 1px 4px rgba(125, 46, 46, 0.06);
+}
+
+.sectionTitle {
+  color: #7d2e2e;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  margin-bottom: 0.875rem;
+  text-align: left;
+}
+
+/* Details Lists */
+.section p {
+  margin: 0.625rem 0;
+  font-size: 0.9375rem;
+  color: #2b2b2b;
+  text-align: left;
+  line-height: 1.6;
+}
+
+.section p strong {
+  color: #7d2e2e;
+  font-weight: 600;
+}
+
+/* Password Input Container */
+.section input[type="text"],
+.section input[type="password"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.section input[type="text"]:focus,
+.section input[type="password"]:focus {
+  border-color: #7d2e2e;
+}
+
+/* Eye Button for Password Toggle */
+.eyeBtn {
+  background: #f7f5f2;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #7d2e2e;
+  min-width: 3rem;
+}
+
+.eyeBtn:hover:not(:disabled) {
+  background: #edeae6;
+  border-color: #7d2e2e;
+}
+
+.eyeBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Error Message */
+.errorMessage {
+  font-size: 0.875rem;
+  color: #a12e2e;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  text-align: left;
+}
+
+/* Success Message */
+.successMessage {
+  font-size: 1.25rem;
+  color: #2d7a2d;
+  font-weight: 700;
+  text-align: center;
+  padding: 1.5rem;
+  background: #f0f9f0;
+  border-radius: 0.625rem;
+  border: 2px solid #2d7a2d;
+}
+
+/* Modal Actions */
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.cancelBtn,
+.confirmBtn {
+  min-width: 9rem;
+  border: none;
+  border-radius: 0.5625rem;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.8125rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn {
+  background: #fff;
+  color: #7d2e2e;
+  border: 2px solid #7d2e2e;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: #f5efef;
+  border-color: #a12e2e;
+}
+
+.cancelBtn:active,
+.cancelBtn:focus {
+  background: #faefef;
+  border-color: #b15656;
+  outline: none;
+}
+
+.cancelBtn:disabled {
+  background: #fbf6f6;
+  color: #c7aaaa;
+  border-color: #c7aaaa;
+  cursor: not-allowed;
+}
+
+.confirmBtn {
+  background-color: #7d2e2e;
+  color: #fff;
+  border: 2px solid #7d2e2e;
+}
+
+.confirmBtn:hover:not(:disabled) {
+  background: #6b2525;
+}
+
+.confirmBtn:active,
+.confirmBtn:focus {
+  background: #671818;
+  outline: none;
+}
+
+.confirmBtn:disabled {
+  background: #dfcccc;
+  color: #965757;
+  border-color: #dfcccc;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+  .pageTitle {
+    font-size: 2.25rem;
+  }
+  
+  .searchBar {
+    width: 95%;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem;
+  }
+  
+  .searchInput,
+  .searchDropdown,
+  .searchBtn {
+    width: 100%;
+  }
+  
+  .bookCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .bookAction {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  .requestBtn {
+    width: 100%;
+  }
+
+  .modal {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 640px) {
+  .pageTitle {
+    font-size: 1.75rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .searchHint {
+    font-size: 1rem;
+  }
+  
+  .modal {
+    padding: 1.5rem 1.25rem;
+    max-width: 95%;
+  }
+  
+  .modalTitle {
+    font-size: 1.375rem;
+  }
+
+  .modalContent {
+    gap: 1rem;
+  }
+  
+  .sectionTitle {
+    font-size: 0.9375rem;
+  }
+  
+  .section {
+    padding: 1rem 0.875rem;
+  }
+  
+  .section p {
+    font-size: 0.875rem;
+  }
+  
+  .modalActions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .cancelBtn,
+  .confirmBtn {
+    width: 100%;
+    min-width: unset;
+  }
+}
