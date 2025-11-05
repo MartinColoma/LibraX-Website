@@ -45,7 +45,8 @@ const librariannewBooksRoute = require("./routes/librarian/quick_actions/qa_newb
 const librarianBookReqRoute = require("./routes/librarian/quick_actions/qa_bookrequests");
 
 // User (Merged Routes)
-const userRoutes = require("./routes/users/searchbooks/search_req");
+const userRoutes = require("./routes/users/search_request/search_req");
+const changePasswordRoutes = require("./routes/changepass"); 
 
 // =========================================
 // 🔹 Serve Static Files (Frontend Build)
@@ -69,6 +70,8 @@ registrationRoutes(app);
 console.log("✅ Registration routes mounted");
 verifyTokenRoutes(app);
 console.log("✅ Verify token routes mounted");
+changePasswordRoutes(app); // ✅ ADD THIS
+console.log("✅ Change password routes mounted");
 
 // Librarian API Calls
 librarianOverviewRoutes(app);

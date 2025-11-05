@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
 import styles from './SearchBooks.module.css';
-import Chatbot from './Chatbot/Chatbot';
 import axios from 'axios';
 import usePageMeta from "../../../../hooks/usePageMeta";
 import Sidebar from "../Sidebar/Sidebar";
@@ -395,8 +394,6 @@ const handleRequestSubmit = async () => {
               </div>
             </div>
           )}
-
-          <Chatbot />
         </div>
       </main>
     </div>

@@ -1,0 +1,226 @@
+/* src/pages/Dashboard/User/Sidebar/ChangePass.module.css */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(67, 40, 24, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background: #faf7f2;
+  border: 2px solid #e8dcc4;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 95%;
+  max-width: 420px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal h2 {
+  text-align: center;
+  color: #7d2e16;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #432818;
+  margin-bottom: -0.5rem;
+}
+
+/* Password Input Wrapper */
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrapper input {
+  width: 100%;
+  padding: 0.75rem;
+  padding-right: 3rem; /* Space for eye icon */
+  border: 1px solid #d4c5a9;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.passwordWrapper input:focus {
+  border-color: #99582a;
+  box-shadow: 0 0 0 3px rgba(125, 46, 22, 0.1);
+}
+
+.passwordWrapper input:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.passwordWrapper input::placeholder {
+  color: #999;
+}
+
+/* Eye Icon Button */
+.eyeButton {
+  position: absolute;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #99582a;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.eyeButton:hover:not(:disabled) {
+  color: #7d2e16;
+  background: rgba(125, 46, 22, 0.05);
+}
+
+.eyeButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.eyeButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.eyeButton:focus-visible {
+  outline: 2px solid #99582a;
+  outline-offset: 2px;
+}
+
+/* Message Styles */
+.message {
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin: 0.5rem 0 0 0;
+  font-weight: 500;
+}
+
+.error {
+  background: #fee;
+  color: #c41e3a;
+  border: 1px solid #fcc;
+}
+
+.success {
+  background: #efe;
+  color: #2d6a2e;
+  border: 1px solid #cfc;
+}
+
+/* Buttons */
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.cancelBtn,
+.submitBtn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+}
+
+.cancelBtn {
+  background: #e8dcc4;
+  color: #432818;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: #d4c5a9;
+}
+
+.submitBtn {
+  background: #7d2e16;
+  color: #faf7f2;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: #99582a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(125, 46, 22, 0.3);
+}
+
+.cancelBtn:disabled,
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .modal {
+    padding: 1.5rem;
+  }
+
+  .modal h2 {
+    font-size: 1.3rem;
+  }
+
+  .buttons {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .cancelBtn,
+  .submitBtn {
+    width: 100%;
+  }
+}

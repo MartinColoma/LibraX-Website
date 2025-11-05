@@ -191,66 +191,6 @@ const authRoutes = (app) => {
       });
     }
   });
-
-  // ===== FIRST LOGIN PASSWORD CHANGE =====
-  app.post("/api/change-password-first-login", async (req, res) => {
-    try {
-      const { user_id, new_password, confirm_password } = req.body;
-
-      if (!user_id || !new_password || !confirm_password) {
-        return res.status(400).json({ error: "All fields are required." });
-      }
-
-      if (new_password !== confirm_password) {
-        return res.status(400).json({ error: "Passwords do not match." });
-      }
-
-      // 1️⃣ Check login history for this user
-      const { data: loginHistory, error: historyErr } = await supabase
-        .from("login_history")
-        .select("history_id")
-        .eq("user_id", user_id);
-
-      if (historyErr) throw historyErr;
-
-      if (!loginHistory || loginHistory.length === 0) {
-        return res.status(404).json({
-          error: "No login record found for this user. Cannot change password.",
-        });
-      }
-
-      // 2️⃣ Only allow password change if first login (1 record only)
-      if (loginHistory.length > 1) {
-        return res.status(403).json({
-          error: "Password change only allowed on first login.",
-        });
-      }
-
-      // 3️⃣ Hash new password
-      const hashedPassword = await bcrypt.hash(new_password, 10);
-
-      // 4️⃣ Update user's password
-      const { error: updateErr } = await supabase
-        .from("users")
-        .update({ password_hash: hashedPassword })
-        .eq("user_id", user_id);
-
-      if (updateErr) throw updateErr;
-
-      console.log(`✅ Password changed successfully for user_id: ${user_id}`);
-
-      return res.status(200).json({
-        message: "✅ Password changed successfully.",
-        password_changed: true,
-      });
-    } catch (err) {
-      console.error("❌ Change password error:", err);
-      return res.status(500).json({
-        message: "❌ Failed to change password.",
-        error: err.message || String(err),
-      });
-    }
-  });
 };
 
 module.exports = authRoutes;

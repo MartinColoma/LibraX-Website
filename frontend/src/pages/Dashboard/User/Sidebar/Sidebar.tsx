@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
-//  BookOpen,
   LayoutDashboard,
   Bell,
   MoreHorizontal,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import "./Sidebar.css";
+import ChangePass from "../../ChangePass/ChangePass";
 
 interface SidebarProps {
   onCollapse?: (collapsed: boolean) => void;
@@ -30,6 +30,7 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
   );
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const [showChangePass, setShowChangePass] = useState(false);
 
   // ✅ Handle sidebar collapse toggle
   const toggleCollapsed = () => {
@@ -80,9 +81,15 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
     { name: "Book Requests", path: "/member/dashboard/news", icon: <Bell size={18} /> },
   ];
 
+  // ✅ Handle change password click
+  const handleChangePasswordClick = () => {
+    setMenuOpen(false); // Close dropdown
+    setShowChangePass(true); // Open modal
+  };
+
   // ✅ Integrated backend logout logic
   const handleLogout = async () => {
-    const API_BASE_URL ="https://librax-website-frontend.onrender.com/api";
+    const API_BASE_URL = "https://librax-website-frontend.onrender.com/api";
 
     try {
       console.log("🔒 Logging out...");
@@ -199,15 +206,9 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
             <div className="user-dropdown">
               {collapsed && <div className="dropdown-user">{username}</div>}
 
-              {/* <button
-                className="dropdown-item"
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate("/user/dashboard/profile");
-                }}
-              >
-                Profile
-              </button> */}
+              <button onClick={handleChangePasswordClick} className="dropdown-item">
+                Change Password
+              </button>
 
               <button className="dropdown-item" onClick={handleLogout}>
                 Logout
@@ -216,6 +217,12 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
           )}
         </div>
       </aside>
+
+      {/* ✅ MOVED OUTSIDE: Render modal at component root level */}
+      <ChangePass 
+        isOpen={showChangePass} 
+        onClose={() => setShowChangePass(false)} 
+      />
     </>
   );
 };
