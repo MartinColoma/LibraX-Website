@@ -14,7 +14,7 @@ const UserHomeRoute = (app) => {
   router.get("/recent-visits/:userId", async (req, res) => {
     try {
       const { userId } = req.params;
-      const { limit = 5 } = req.query;
+      const { limit = 100 } = req.query; // Default to 100 instead of 5
 
       console.log(`📊 Fetching recent visits for user: ${userId}`); // DEBUG LOG
 
@@ -53,7 +53,7 @@ const UserHomeRoute = (app) => {
   router.get("/recent-borrows/:userId", async (req, res) => {
     try {
       const { userId } = req.params;
-      const { limit = 5 } = req.query;
+      const { limit = 100 } = req.query; // Default to 100 instead of 5
 
       console.log(`📚 Fetching recent borrows for user: ${userId}`); // DEBUG LOG
 

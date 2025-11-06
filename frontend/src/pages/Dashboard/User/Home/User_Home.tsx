@@ -32,7 +32,7 @@ interface BorrowedBook {
 }
 
 // API Base URL
-const API_BASE_URL = "https://librax-website-frontend.onrender.com";
+const API_BASE_URL = "http://localhost:10000";
 
 const MemberDashboard: React.FC = () => {
   usePageMeta("User Dashboard - Home", "/LibraX Square Logo 1.png");
@@ -48,6 +48,11 @@ const MemberDashboard: React.FC = () => {
   const [recentVisits, setRecentVisits] = useState<Visit[]>([]);
   const [recentBorrows, setRecentBorrows] = useState<BorrowedBook[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Pagination states
+  const [visitsPage, setVisitsPage] = useState<number>(1);
+  const [borrowsPage, setBorrowsPage] = useState<number>(1);
+  const itemsPerPage = 5;
 
   // 🕒 Live Date & Time
   const [currentDateTime, setCurrentDateTime] = useState<string>("");
@@ -106,27 +111,25 @@ const MemberDashboard: React.FC = () => {
     }, SESSION_DURATION_MINUTES * 60 * 1000);
   };
 
-  // 📊 Fetch dashboard data
+  // 📊 Fetch dashboard data (fetch ALL records, not limited to 5)
   const fetchDashboardData = async (uid: string) => {
     try {
       setLoading(true);
       const authToken = localStorage.getItem("auth_token");
 
-      // Fetch recent visits
-      const visitsResponse = await fetch(`${API_BASE_URL}/api/user/home/recent-visits/${uid}?limit=5`, {
+      // Fetch ALL visits (remove or increase limit)
+      const visitsResponse = await fetch(`${API_BASE_URL}/api/user/home/recent-visits/${uid}?limit=100`, {
         headers: { Authorization: `Bearer ${authToken}` }
       });
       const visitsData = await visitsResponse.json();
       if (visitsData.success) setRecentVisits(visitsData.data);
 
-      // Fetch recent borrows
-      const borrowsResponse = await fetch(`${API_BASE_URL}/api/user/home/recent-borrows/${uid}?limit=5`, {
+      // Fetch ALL borrows (remove or increase limit)
+      const borrowsResponse = await fetch(`${API_BASE_URL}/api/user/home/recent-borrows/${uid}?limit=100`, {
         headers: { Authorization: `Bearer ${authToken}` }
       });
       const borrowsData = await borrowsResponse.json();
       if (borrowsData.success) setRecentBorrows(borrowsData.data);
-
-
 
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -208,6 +211,23 @@ const MemberDashboard: React.FC = () => {
     }
   };
 
+  // 📄 Pagination logic
+  const getPaginatedData = <T,>(data: T[], page: number): T[] => {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return data.slice(startIndex, endIndex);
+  };
+
+  const getTotalPages = (dataLength: number): number => {
+    return Math.ceil(dataLength / itemsPerPage);
+  };
+
+  const paginatedVisits = getPaginatedData(recentVisits, visitsPage);
+  const paginatedBorrows = getPaginatedData(recentBorrows, borrowsPage);
+
+  const visitsTotalPages = getTotalPages(recentVisits.length);
+  const borrowsTotalPages = getTotalPages(recentBorrows.length);
+
   return (
     <div className="page-layout">
       {/* ⚠️ Session Warning Modal */}
@@ -278,38 +298,63 @@ const MemberDashboard: React.FC = () => {
             <div className="activity-card">
               <div className="activity-header">
                 <h2>Recent Library Visits</h2>
-                <span className="activity-count">{recentVisits.length} visits</span>
+                <span className="activity-count">{recentVisits.length} total visits</span>
               </div>
               
               {loading ? (
                 <div className="loading-state">Loading visits...</div>
               ) : recentVisits.length > 0 ? (
-                <div className="table-container">
-                  <table className="activity-table">
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Status</th>
-                        <th>Reader</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentVisits.map((visit) => (
-                        <tr key={visit.attendance_id}>
-                          <td>{formatDate(visit.scan_time)}</td>
-                          <td>{formatTime(visit.scan_time)}</td>
-                          <td>
-                            <span className={`status-badge ${getStatusClass(visit.status)}`}>
-                              {visit.status}
-                            </span>
-                          </td>
-                          <td>Reader {visit.reader_number}</td>
+                <>
+                  <div className="table-container">
+                    <table className="activity-table">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Time</th>
+                          <th>Status</th>
+                          <th>Reader</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {paginatedVisits.map((visit) => (
+                          <tr key={visit.attendance_id}>
+                            <td>{formatDate(visit.scan_time)}</td>
+                            <td>{formatTime(visit.scan_time)}</td>
+                            <td>
+                              <span className={`status-badge ${getStatusClass(visit.status)}`}>
+                                {visit.status}
+                              </span>
+                            </td>
+                            <td>Reader {visit.reader_number}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Pagination Controls */}
+                  {visitsTotalPages > 1 && (
+                    <div className="pagination-controls">
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setVisitsPage(prev => Math.max(1, prev - 1))}
+                        disabled={visitsPage === 1}
+                      >
+                        Previous
+                      </button>
+                      <span className="pagination-info">
+                        Page {visitsPage} of {visitsTotalPages}
+                      </span>
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setVisitsPage(prev => Math.min(visitsTotalPages, prev + 1))}
+                        disabled={visitsPage === visitsTotalPages}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="empty-state">
                   <p>No recent library visits found.</p>
@@ -321,49 +366,74 @@ const MemberDashboard: React.FC = () => {
             <div className="activity-card">
               <div className="activity-header">
                 <h2>Recent Borrowed Books</h2>
-                <span className="activity-count">{recentBorrows.length} records</span>
+                <span className="activity-count">{recentBorrows.length} total records</span>
               </div>
               
               {loading ? (
                 <div className="loading-state">Loading borrowed books...</div>
               ) : recentBorrows.length > 0 ? (
-                <div className="table-container">
-                  <table className="activity-table">
-                    <thead>
-                      <tr>
-                        <th>Book Title</th>
-                        <th>Borrow Date</th>
-                        <th>Due Date</th>
-                        <th>Status</th>
-                        {!isMobile && <th>Fine</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {recentBorrows.map((borrow) => (
-                        <tr key={borrow.borrow_id}>
-                          <td className="book-title-cell">
-                            <div className="book-title">{borrow.books.title}</div>
-                            {borrow.books.subtitle && (
-                              <div className="book-subtitle">{borrow.books.subtitle}</div>
-                            )}
-                          </td>
-                          <td>{formatDate(borrow.borrow_date)}</td>
-                          <td>{formatDate(borrow.due_date)}</td>
-                          <td>
-                            <span className={`status-badge ${getStatusClass(borrow.status)}`}>
-                              {borrow.status}
-                            </span>
-                          </td>
-                          {!isMobile && (
-                            <td className={borrow.fine_amount > 0 ? "fine-amount" : ""}>
-                              {borrow.fine_amount > 0 ? `₱${borrow.fine_amount}` : "-"}
-                            </td>
-                          )}
+                <>
+                  <div className="table-container">
+                    <table className="activity-table">
+                      <thead>
+                        <tr>
+                          <th>Book Title</th>
+                          <th>Borrow Date</th>
+                          <th>Due Date</th>
+                          <th>Status</th>
+                          {!isMobile && <th>Fine</th>}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {paginatedBorrows.map((borrow) => (
+                          <tr key={borrow.borrow_id}>
+                            <td className="book-title-cell">
+                              <div className="book-title">{borrow.books.title}</div>
+                              {borrow.books.subtitle && (
+                                <div className="book-subtitle">{borrow.books.subtitle}</div>
+                              )}
+                            </td>
+                            <td>{formatDate(borrow.borrow_date)}</td>
+                            <td>{formatDate(borrow.due_date)}</td>
+                            <td>
+                              <span className={`status-badge ${getStatusClass(borrow.status)}`}>
+                                {borrow.status}
+                              </span>
+                            </td>
+                            {!isMobile && (
+                              <td className={borrow.fine_amount > 0 ? "fine-amount" : ""}>
+                                {borrow.fine_amount > 0 ? `₱${borrow.fine_amount}` : "-"}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Pagination Controls */}
+                  {borrowsTotalPages > 1 && (
+                    <div className="pagination-controls">
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setBorrowsPage(prev => Math.max(1, prev - 1))}
+                        disabled={borrowsPage === 1}
+                      >
+                        Previous
+                      </button>
+                      <span className="pagination-info">
+                        Page {borrowsPage} of {borrowsTotalPages}
+                      </span>
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setBorrowsPage(prev => Math.min(borrowsTotalPages, prev + 1))}
+                        disabled={borrowsPage === borrowsTotalPages}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="empty-state">
                   <p>No borrowed books found.</p>

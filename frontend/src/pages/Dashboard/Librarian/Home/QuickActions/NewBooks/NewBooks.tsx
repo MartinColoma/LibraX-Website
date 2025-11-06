@@ -149,34 +149,43 @@ const NewBooks: React.FC = () => {
     checkNFCSupport();
   }, []);
 
-  // === GLOBAL USB NFC LISTENER (only when on step 4 and scanning) ===
-  useEffect(() => {
-    if (!usbNFCMode || step !== 4 || !nfcReading) return;
+// === GLOBAL USB NFC LISTENER (only when on step 4 and scanning) ===
+useEffect(() => {
+  if (!usbNFCMode || step !== 4 || !nfcReading) return;
 
-    let buffer = "";
-    const handleGlobalKey = (e: KeyboardEvent) => {
-      // NFC reader usually ends with Enter
-      if (e.key === "Enter") {
-        if (buffer.trim()) {
-          const nfcDataHex = convertDecimalUidToHex(buffer.trim());
-          
-          if (!scannedUIDs.includes(nfcDataHex)) {
-            setScannedUIDs((prev) => [...prev, nfcDataHex]);
-            setNfcMessage(`✅ USB NFC Reader: ${nfcDataHex}`);
-          } else {
-            setNfcMessage(`⚠️ Duplicate NFC UID: ${nfcDataHex}`);
-          }
+  let buffer = "";
+
+  const handleGlobalKey = (e: KeyboardEvent) => {
+    // NFC reader usually ends with Enter key
+    if (e.key === "Enter") {
+      if (buffer.trim()) {
+        const rawData = buffer.trim();
+
+        // Detect if it's a decimal UID (long digits only)
+        const isDecimal = /^\d+$/.test(rawData) && rawData.length > 5;
+        const nfcDataHex = isDecimal
+          ? convertDecimalUidToHex(rawData)
+          : rawData;
+
+        // ✅ Prevent cutting — keep full UID
+        if (!scannedUIDs.includes(nfcDataHex)) {
+          setScannedUIDs((prev) => [...prev, nfcDataHex]);
+          setNfcMessage(`✅ USB NFC Reader: ${nfcDataHex}`);
+        } else {
+          setNfcMessage(`⚠️ Duplicate NFC UID: ${nfcDataHex}`);
         }
-        buffer = "";
-        e.preventDefault();
-      } else if (e.key.length === 1) {
-        buffer += e.key;
       }
-    };
+      buffer = "";
+      e.preventDefault();
+    } else if (e.key.length === 1) {
+      buffer += e.key;
+    }
+  };
 
-    window.addEventListener("keydown", handleGlobalKey);
-    return () => window.removeEventListener("keydown", handleGlobalKey);
-  }, [usbNFCMode, step, nfcReading, scannedUIDs]);
+  window.addEventListener("keydown", handleGlobalKey);
+  return () => window.removeEventListener("keydown", handleGlobalKey);
+}, [usbNFCMode, step, nfcReading, scannedUIDs]);
+
 
   // === NFC HANDLERS ===
   const startNFCReading = async () => {
