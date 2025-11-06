@@ -49,6 +49,7 @@ router.get("/book-requests", async (req, res) => {
           book_condition
         )
       `)
+      .eq("status", "Pending Approval") // ✅ Only fetch pending requests
       .order("request_date", { ascending: false });
 
     if (error) {

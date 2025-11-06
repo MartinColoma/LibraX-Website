@@ -112,6 +112,8 @@ const LibrarianDashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, [isMobile]);
 
+  const showReturnBook = false; // toggle this later when needed
+
   return (
     <div className="page-layout">
       {/* Session Modals */}
@@ -182,7 +184,8 @@ const LibrarianDashboard: React.FC = () => {
         <div className="quick-actions">
           <h2>Quick Actions</h2>
           <div className="tab-header">
-            {["overview", "addBook", "registerMember", "bookRequest", "returnBook"].map((tab) => (
+
+            {["overview", "addBook", "registerMember", "bookRequest", ...(showReturnBook ? ["returnBook"] : [])].map((tab) => (
               <button
                 key={tab}
                 className={activeQuickAction === tab ? "active-tab" : ""}
@@ -203,6 +206,7 @@ const LibrarianDashboard: React.FC = () => {
                 )}
               </button>
             ))}
+
           </div>
           <div className="tab-content">
             {activeQuickAction === "overview" ? (
