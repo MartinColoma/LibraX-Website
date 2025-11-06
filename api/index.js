@@ -38,6 +38,7 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
 const authRoutes = require("./routes/auth");
 const registrationRoutes = require("./routes/registration");
 const verifyTokenRoutes = require("./routes/verify-token");
+const changePasswordRoutes = require("./routes/changepass"); 
 
 // Librarian
 const librarianOverviewRoutes = require("./routes/librarian/quick_actions/qa_overview");
@@ -45,8 +46,8 @@ const librariannewBooksRoute = require("./routes/librarian/quick_actions/qa_newb
 const librarianBookReqRoute = require("./routes/librarian/quick_actions/qa_bookrequests");
 
 // User (Merged Routes)
-const userRoutes = require("./routes/users/search_request/search_req");
-const changePasswordRoutes = require("./routes/changepass"); 
+const user_home = require("./routes/users/home/user_home");
+const user_search_req = require("./routes/users/search_request/search_req");
 
 // =========================================
 // 🔹 Serve Static Files (Frontend Build)
@@ -82,7 +83,9 @@ librarianBookReqRoute(app);
 console.log("✅ Book request routes mounted");
 
 // User API Calls (Merged)
-userRoutes(app);
+user_home(app);
+console.log("✅ User Home Routes mounted (visits and borrowed books)");
+user_search_req(app);
 console.log("✅ User routes mounted (search, verify-password, books/request)");
 
 // =========================================

@@ -9,7 +9,7 @@ LibraX
 │   ├── package.json
 │   └── routes
 │       ├── auth.js
-│       ├── changepss.js
+│       ├── changepass.js
 │       ├── librarian
 │       │   └── quick_actions
 │       │       ├── qa_bookrequests.js
@@ -17,6 +17,8 @@ LibraX
 │       │       └── qa_overview.js
 │       ├── registration.js
 │       ├── users
+│       │   ├── home
+│       │   │   └── user_home.js
 │       │   └── search_request
 │       │       └── search_req.js
 │       └── verify-token.js
@@ -59,6 +61,9 @@ LibraX
 │   │   ├── main.tsx
 │   │   ├── pages
 │   │   │   ├── Dashboard
+│   │   │   │   ├── ChangePass
+│   │   │   │   │   ├── ChangePass.module.css
+│   │   │   │   │   └── ChangePass.tsx
 │   │   │   │   ├── Librarian
 │   │   │   │   │   ├── Home
 │   │   │   │   │   │   ├── Lib_Home.css
@@ -97,8 +102,6 @@ LibraX
 │   │   │   │       │   ├── SearchBooks.module.css
 │   │   │   │       │   └── SearchBooks.tsx
 │   │   │   │       └── Sidebar
-│   │   │   │           ├── ChangePass.module.css
-│   │   │   │           ├── ChangePass.tsx
 │   │   │   │           ├── Sidebar.css
 │   │   │   │           └── Sidebar.tsx
 │   │   │   ├── LandingPage
