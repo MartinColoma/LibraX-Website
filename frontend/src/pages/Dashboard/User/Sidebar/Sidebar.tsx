@@ -4,7 +4,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
-  Bell,
+//  Bell,
   MoreHorizontal,
   Menu,
   X,
@@ -78,7 +78,7 @@ const MergedSidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
   const navItems = [
     { name: "Home", path: "/user/dashboard/home", icon: <LayoutDashboard size={18} /> },
     { name: "Search Books", path: "/user/dashboard/search-books", icon: <SearchCheck size={18} /> },
-    { name: "Book Requests", path: "/member/dashboard/news", icon: <Bell size={18} /> },
+    // { name: "Requested Books", path: "/user/dashboard/requested-books", icon: <Bell size={18} /> },
   ];
 
   // ✅ Handle change password click

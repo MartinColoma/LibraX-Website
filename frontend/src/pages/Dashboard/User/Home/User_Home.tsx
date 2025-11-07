@@ -32,7 +32,7 @@ interface BorrowedBook {
 }
 
 // API Base URL
-const API_BASE_URL = "http://localhost:10000";
+const API_BASE_URL = "https://librax-website-frontend.onrender.com";
 
 const MemberDashboard: React.FC = () => {
   usePageMeta("User Dashboard - Home", "/LibraX Square Logo 1.png");
