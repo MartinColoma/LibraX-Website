@@ -9,7 +9,7 @@ import NewBooks from "./QuickActions/NewBooks/NewBooks";
 import Request from "./QuickActions/BookRequest/BookRequest";
 
 const LibrarianDashboard: React.FC = () => {
-  usePageMeta("User Dashboard - Home", "/LibraX Square Logo 1.png");
+  usePageMeta("Librarian Dashboard - Home", "/LibraX Square Logo 1.png");
   const navigate = useNavigate();
 
   const [memberName, setMemberName] = useState<string>("");
