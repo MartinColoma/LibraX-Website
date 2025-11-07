@@ -94,9 +94,9 @@ export default function BookRequestsPage() {
     <div className="book-requests-container">
       <div className="book-requests-header">
         <h2>Book Requests</h2>
-        <button className="issue-book-btn">
+        {/* <button className="issue-book-btn">
           Issue Book
-        </button>
+        </button> */}
       </div>
 
       {loading ? (
