@@ -33,9 +33,23 @@ const Chatbot: React.FC = () => {
     "Checking available books..."
   ];
 
-  useEffect(() => {
+  const scrollToBottom = () => {
     msgEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
   }, [messages, isTyping]);
+
+  // Scroll to bottom when modal opens/closes
+  useEffect(() => {
+    if (open) {
+      // Small delay to ensure DOM is rendered
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }
+  }, [open]);
 
   // auto expand textarea
   useEffect(() => {
@@ -107,7 +121,7 @@ const Chatbot: React.FC = () => {
     <div className={styles.chatbotContainer}>
       <div className={styles.header} onClick={() => setOpen(o => !o)}>
         <b>LibraX Chatbot</b>
-        <span>{open ? "▼" : "▲"}</span>
+        <span className={styles.arrow}>{open ? "▼" : "▲"}</span>
       </div>
 
       {open && (
@@ -116,13 +130,11 @@ const Chatbot: React.FC = () => {
             {messages.map(msg => (
               msg.sender === "user" ? (
                 <div key={msg.id} className={styles.userBubble}>
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {msg.text}
-                  </ReactMarkdown>
+                  {msg.text}
                 </div>
               ) : (
                 <div key={msg.id} className={styles.botBubble}>
-                  <div className={styles.botBubbleContent}>
+                  <div className={`${styles.botBubbleContent} ${styles.markdown}`}>
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {msg.text}
                     </ReactMarkdown>

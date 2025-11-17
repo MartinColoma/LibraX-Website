@@ -2,14 +2,14 @@
   width: 500px;
   max-height: 70vh;
   height: auto;
-  border: 2px solid #842f31;
-  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
   position: fixed;
   bottom: 20px;
   right: 25px;
-  background: #fff;
-  box-shadow: 0 6px 20px rgba(132, 47, 49, 0.3);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #fff8f0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   z-index: 998;
   display: flex;
   flex-direction: column;
@@ -17,25 +17,36 @@
 }
 
 .header {
-  background: #efdddd;
-  color: #320000;
-  padding: 12px 20px;
+  background: #7d2e2e;
+  color: #fff;
+  padding: 16px 20px;
   font-size: 1.12rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-weight: 600;
-  border-bottom: 3px solid #842f31;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   cursor: pointer;
   user-select: none;
   flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.header:hover {
+  background: #6a2626;
+}
+
+.arrow {
+  font-weight: 600;
+  font-size: 1.1em;
+  transition: transform 0.3s ease;
 }
 
 .chatBody {
   display: flex;
   flex-direction: column;
   flex: 1;
-  background: #fefefe;
+  background: #fff8f0;
   padding: 16px 12px;
   overflow: hidden;
   min-height: 0;
@@ -58,16 +69,22 @@
 .botBubble {
   align-self: flex-start;
   background: #fff;
-  border: 2px solid #320000;
-  border-radius: 16px;
-  padding: 10px 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px 18px 18px 4px;
+  padding: 12px 18px;
   font-size: 1rem;
-  color: #222;
+  color: #333;
   max-width: 95%;
-  box-shadow: 0 2px 7px rgba(50, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   overflow: visible;
+  line-height: 1.6;
+  font-weight: 500;
+  word-wrap: break-word;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .botBubbleContent {
@@ -77,73 +94,105 @@
 
 .userBubble {
   align-self: flex-end;
-  background: #e6f3fb;
-  border: 2px solid #54b1ff;
-  border-radius: 16px;
-  padding: 10px 18px;
+  background: #7d2e2e;
+  color: #fff;
+  border: none;
+  border-radius: 18px 18px 4px 18px;
+  padding: 12px 18px;
   font-size: 1rem;
-  color: #123;
   max-width: 80%;
-  box-shadow: 0 2px 7px rgba(84, 177, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(125, 46, 46, 0.25);
   word-wrap: break-word;
   overflow-wrap: break-word;
+  line-height: 1.6;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Input area */
 .inputArea {
   display: flex;
   align-items: flex-end;
-  border-top: 2px solid #842f31;
-  padding-top: 10px;
-  gap: 8px;
-  background-color: #fafafa;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  gap: 12px;
+  background-color: #fff;
   flex-shrink: 0;
 }
 
 /* Dynamic textarea */
 .inputBox {
   flex: 1;
-  font-size: 1.1rem;
-  border: 2px solid #bbb;
-  border-radius: 10px;
-  padding: 10px 14px;
+  font-size: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 24px;
+  padding: 12px 16px;
   outline: none;
   resize: none;
   overflow-y: auto;
   max-height: 100px;
   line-height: 1.3rem;
+  background: #fff8f0;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .inputBox:focus {
-  border-color: #842f31;
+  border-color: #ff9a56;
+  box-shadow: 0 0 0 3px rgba(255, 154, 86, 0.1);
+}
+
+.inputBox::placeholder {
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .sendBtn {
-  background: #842f31;
+  background: #7d2e2e;
+  color: white;
   border: none;
   font-weight: 600;
-  border-radius: 10px;
-  padding: 10px 18px;
+  border-radius: 24px;
+  padding: 12px 24px;
   cursor: pointer;
-  color: #fff;
-  font-size: 1.1rem;
-  transition: background 0.25s ease;
+  font-size: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(125, 46, 46, 0.3);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .sendBtn:hover {
-  background: #a03b3c;
+  background: #6a2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(125, 46, 46, 0.4);
+}
+
+.sendBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(125, 46, 46, 0.3);
 }
 
 .sendBtn:disabled {
   background: #ccc;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .typing {
   display: inline-block;
   font-size: 0.95rem;
   font-style: italic;
-  color: #842f31;
+  color: #7d2e2e;
 }
 
 /* Markdown styling inside bot bubbles only */
@@ -209,7 +258,7 @@
   padding: 2px 5px;
   border-radius: 6px;
   font-size: 0.9rem;
-  color: #842f31;
+  color: #7d2e2e;
   border: 1px solid #ddd;
   word-break: break-word;
 }
@@ -238,24 +287,26 @@
 
 /* Links */
 .markdown a {
-  color: #842f31;
+  color: #7d2e2e;
   text-decoration: underline;
   word-break: break-word;
 }
 
 .markdown a:hover {
-  color: #a64143;
+  color: #6a2626;
 }
 
-/* Tables - Fixed for better readability */
+/* Tables - Fixed header and proper alignment with horizontal scroll */
 .markdown table {
   border-collapse: collapse;
-  margin-bottom: 12px;
+  margin-bottom: 0;
   width: 100%;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
   display: block;
   overflow-x: auto;
-  font-size: 0.95rem;
-  max-width: 100%;
+  overflow-y: visible;
 }
 
 .markdown thead,
@@ -265,6 +316,12 @@
   table-layout: auto;
 }
 
+.markdown thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
 .markdown tr {
   display: table-row;
 }
@@ -272,31 +329,26 @@
 .markdown th,
 .markdown td {
   display: table-cell;
-  border: 2px solid #d4a5a5;
-  padding: 10px 14px;
+  border: 1px solid #e0e0e0;
+  padding: 12px 16px;
   text-align: left;
   vertical-align: top;
-  white-space: normal;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  min-width: 100px;
-  line-height: 1.4;
+  line-height: 1.5;
+  min-width: 120px;
 }
 
 .markdown th {
-  background: #842f31;
+  background: #7d2e2e;
   font-weight: 600;
   color: #ffffff;
   white-space: nowrap;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  border-color: #6b2525;
+  border-color: #6a2626;
 }
 
 .markdown td {
-  max-width: 250px;
   background: #ffffff;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .markdown tbody tr:nth-child(even) td {
@@ -305,21 +357,40 @@
 
 .markdown tbody tr:hover td {
   background: #fde8e8;
+  transition: background-color 0.15s ease;
 }
 
-/* Custom scrollbar for messages area */
-.messagesArea::-webkit-scrollbar {
-  width: 8px;
+/* Scrollbar for tables */
+.markdown table::-webkit-scrollbar {
+  height: 4px;
 }
 
-.messagesArea::-webkit-scrollbar-track {
+.markdown table::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
 
-.messagesArea::-webkit-scrollbar-thumb {
-  background: #842f31;
+.markdown table::-webkit-scrollbar-thumb {
+  background: #6b2525;
   border-radius: 4px;
+}
+
+.markdown table::-webkit-scrollbar-thumb:hover {
+  background: #6b2525;
+}
+
+/* Custom scrollbar for messages area */
+.messagesArea::-webkit-scrollbar {
+  width: 4px;
+}
+
+.messagesArea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messagesArea::-webkit-scrollbar-thumb {
+  background: #6b2525;
+  border-radius: 3px;
 }
 
 .messagesArea::-webkit-scrollbar-thumb:hover {
@@ -337,36 +408,17 @@
 }
 
 .botBubbleContent::-webkit-scrollbar-thumb {
-  background: #842f31;
+  background: rgba(255, 154, 86, 0.5);
   border-radius: 4px;
 }
 
 .botBubbleContent::-webkit-scrollbar-thumb:hover {
-  background: #6b2525;
-}
-
-/* Scrollbar for tables */
-.markdown table::-webkit-scrollbar {
-  height: 8px;
-}
-
-.markdown table::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.markdown table::-webkit-scrollbar-thumb {
-  background: #842f31;
-  border-radius: 4px;
-}
-
-.markdown table::-webkit-scrollbar-thumb:hover {
-  background: #6b2525;
+  background: rgba(255, 154, 86, 0.7);
 }
 
 /* Scrollbar for code blocks (vertical only) */
 .markdown pre::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
 }
 
 .markdown pre::-webkit-scrollbar-track {
@@ -397,16 +449,16 @@
 
   .header {
     font-size: 1.05rem;
-    padding: 10px 16px;
+    padding: 14px 18px;
   }
 
   .inputBox {
     font-size: 1rem;
-    padding: 9px 12px;
+    padding: 11px 14px;
   }
 
   .sendBtn {
-    padding: 9px 16px;
+    padding: 11px 20px;
     font-size: 1rem;
   }
 }
@@ -414,20 +466,20 @@
 /* Mobile devices (768px and below) */
 @media (max-width: 768px) {
   .chatbotContainer {
-    width: calc(100vw - 32px);
-    max-width: 420px;
-    right: 16px;
-    bottom: 12px;
+    width: 90%;
+    right: 5%;
+    bottom: 10px;
     max-height: 65vh;
   }
 
   .header {
     font-size: 1rem;
-    padding: 10px 14px;
+    padding: 12px 16px;
   }
 
   .chatBody {
     padding: 12px 10px;
+    height: 500px;
   }
 
   .messagesArea {
@@ -438,18 +490,23 @@
   .botBubble,
   .userBubble {
     max-width: 85%;
-    padding: 9px 14px;
+    padding: 10px 16px;
     font-size: 0.95rem;
+  }
+
+  .inputArea {
+    padding: 12px;
   }
 
   .inputBox {
     font-size: 0.95rem;
-    padding: 8px 12px;
+    padding: 10px 14px;
     max-height: 90px;
   }
 
   .sendBtn {
-    padding: 8px 14px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
   }
 
   .markdown {
@@ -462,13 +519,8 @@
 
   .markdown th,
   .markdown td {
-    padding: 8px 12px;
+    padding: 10px 12px;
     font-size: 0.9rem;
-    min-width: 80px;
-  }
-
-  .markdown td {
-    max-width: 200px;
   }
 }
 
@@ -479,13 +531,13 @@
     right: 10px;
     bottom: 10px;
     max-height: 60vh;
-    border-radius: 10px;
+    border-radius: 14px;
   }
 
   .header {
     font-size: 0.95rem;
-    padding: 9px 12px;
-    border-radius: 8px 8px 0 0;
+    padding: 10px 14px;
+    border-radius: 14px 14px 0 0;
   }
 
   .chatBody {
@@ -500,27 +552,31 @@
   .botBubble,
   .userBubble {
     max-width: 90%;
-    padding: 8px 12px;
+    padding: 9px 14px;
     font-size: 0.9rem;
-    border-radius: 14px;
+    border-radius: 16px 16px 16px 3px;
+  }
+
+  .userBubble {
+    border-radius: 16px 16px 3px 16px;
   }
 
   .inputArea {
-    padding-top: 8px;
-    gap: 6px;
+    padding: 10px;
+    gap: 8px;
   }
 
   .inputBox {
     font-size: 0.9rem;
-    padding: 7px 10px;
+    padding: 9px 12px;
     max-height: 80px;
     line-height: 1.2rem;
-    border-radius: 8px;
+    border-radius: 20px;
   }
 
   .sendBtn {
-    padding: 7px 12px;
-    border-radius: 8px;
+    padding: 9px 16px;
+    border-radius: 20px;
   }
 
   .markdown {
@@ -543,13 +599,8 @@
 
   .markdown th,
   .markdown td {
-    padding: 6px 10px;
+    padding: 8px 10px;
     font-size: 0.85rem;
-    min-width: 70px;
-  }
-
-  .markdown td {
-    max-width: 150px;
   }
 }
 
@@ -564,7 +615,7 @@
 
   .header {
     font-size: 0.9rem;
-    padding: 8px 10px;
+    padding: 9px 12px;
   }
 
   .chatBody {
@@ -573,17 +624,17 @@
 
   .botBubble,
   .userBubble {
-    padding: 7px 10px;
+    padding: 8px 12px;
     font-size: 0.85rem;
   }
 
   .inputBox {
     font-size: 0.85rem;
-    padding: 6px 9px;
+    padding: 8px 11px;
   }
 
   .sendBtn {
-    padding: 6px 10px;
+    padding: 8px 14px;
   }
 
   .typing {
@@ -592,12 +643,7 @@
 
   .markdown th,
   .markdown td {
-    padding: 5px 8px;
+    padding: 6px 8px;
     font-size: 0.8rem;
-    min-width: 60px;
-  }
-
-  .markdown td {
-    max-width: 120px;
   }
 }
