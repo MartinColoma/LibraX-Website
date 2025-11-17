@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./User_Home.css";
 import usePageMeta from "../../../../hooks/usePageMeta";
 import Sidebar from "../Sidebar/Sidebar";
+import Chatbot from '../SearchBooks/Chatbot/Chatbot';
 
 interface Visit {
   attendance_id: number;
@@ -445,6 +446,8 @@ const MemberDashboard: React.FC = () => {
 
         </div>
       </main>
+      <Chatbot />
+
     </div>
   );
 };
