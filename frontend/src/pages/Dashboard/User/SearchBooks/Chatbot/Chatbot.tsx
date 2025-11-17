@@ -1,161 +1,167 @@
-import React, { useState } from 'react';
-import styles from './Chatbot.module.css'; // your CSS file
+import React, { useState, useEffect, useRef } from "react";
+import styles from "./Chatbot.module.css";
+import { Send } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-const initialMessages = [
-  { id: 1, text: 'Welcome to LibraX!', sender: 'bot' },
-  { id: 2, text: 'How can I help you?', sender: 'bot' },
+interface Message {
+  id: string;
+  text: string;
+  sender: "user" | "bot";
+}
+
+const initialMessages: Message[] = [
+  { id: "welcome", text: "Welcome to **LibraX Chatbot**!", sender: "bot" },
+  { id: "help", text: "Ask about *book titles*, **authors**, or release dates.", sender: "bot" }
 ];
 
-// Function to fetch instant answers from DuckDuckGo API
-async function fetchDuckDuckGoInstantAnswer(query: string): Promise<string> {
-  const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('DuckDuckGo API error');
-  const data = await response.json();
-
-  if (data.AbstractText) return data.AbstractText;
-  if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-    return data.RelatedTopics[0].Text || 'No relevant instant answer found.';
-  }
-  return 'No relevant instant answer found.';
-}
-
-// Function to fetch instant answers from Wikidata API
-async function fetchWikidataInstantAnswer(query: string): Promise<string> {
-  const endpointUrl = 'https://query.wikidata.org/sparql';
-  const sparqlQuery = `
-    SELECT ?item ?itemLabel ?description WHERE {
-      ?item rdfs:label ?itemLabel.
-      OPTIONAL { ?item schema:description ?description. }
-      FILTER(CONTAINS(LCASE(?itemLabel), "${query.toLowerCase()}") && LANG(?itemLabel) = "en")
-    }
-    LIMIT 1
-  `;
-  const url = endpointUrl + '?query=' + encodeURIComponent(sparqlQuery) + '&format=json';
-
-  try {
-    const response = await fetch(url, {
-      headers: { 'Accept': 'application/sparql-results+json' }
-    });
-    if (!response.ok) throw new Error('Wikidata API error');
-    const data = await response.json();
-
-    if (data.results.bindings.length > 0) {
-      const binding = data.results.bindings[0];
-      const label = binding.itemLabel.value || '';
-      const description = binding.description ? binding.description.value : '';
-      return description ? `${label}: ${description}` : label;
-    }
-    return 'No relevant instant answer found from Wikidata.';
-  } catch {
-    return 'Error accessing Wikidata API.';
-  }
-}
-
 const Chatbot: React.FC = () => {
-  const [messages, setMessages] = useState(initialMessages);
-  const [input, setInput] = useState('');
-  const [open, setOpen] = useState(false);
-  const [isTyping, setIsTyping] = useState(false); // For typing animation
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingText, setTypingText] = useState("AI is thinking...");
+  const [open, setOpen] = useState(true);
 
-  const handleSend = async () => {
-    if (input.trim() === '') return;
+  const msgEndRef = useRef<HTMLDivElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const typingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // Add user's message to chat
-    setMessages(prev => [
-      ...prev,
-      { id: prev.length + 1, text: input, sender: 'user' },
-    ]);
+  const typingMessages = [
+    "AI is thinking...",
+    "Analyzing your query...",
+    "Fetching data from the library...",
+    "Checking available books..."
+  ];
 
-    const userInput = input;
-    setInput('');
-    setIsTyping(true); // show typing animation
+  useEffect(() => {
+    msgEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping]);
+
+  // auto expand textarea
+  useEffect(() => {
+    if (!textAreaRef.current) return;
+    const el = textAreaRef.current;
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 100) + "px";
+  }, [input]);
+
+  const startTypingAnimation = () => {
+    let index = 0;
+    typingIntervalRef.current = setInterval(() => {
+      setTypingText(typingMessages[index]);
+      index = (index + 1) % typingMessages.length;
+    }, 1200);
+  };
+
+  const stopTypingAnimation = () => {
+    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+    typingIntervalRef.current = null;
+    setTypingText("AI is thinking...");
+  };
+
+  const sendMessage = async () => {
+    if (!input.trim()) return;
+
+    const userMsg: Message = {
+      id: Date.now() + "user",
+      text: input.trim(),
+      sender: "user"
+    };
+
+    setMessages(prev => [...prev, userMsg]);
+    setInput("");
+    setIsTyping(true);
+    startTypingAnimation();
 
     try {
-      // Fetch instant answer from DuckDuckGo
-      let duckAnswer = await fetchDuckDuckGoInstantAnswer(userInput);
+      const formattedMessages = [...messages, userMsg].map(m => ({
+        role: m.sender === "user" ? "user" : "assistant",
+        content: m.text
+      }));
 
-      // If DuckDuckGo returns no relevant answer, try Wikidata
-      if (duckAnswer === 'No relevant instant answer found.') {
-        duckAnswer = await fetchWikidataInstantAnswer(userInput);
-      }
-
-      const combinedPrompt = `Instant answer: ${duckAnswer}\n\nQuestion: ${userInput}\nPlease answer briefly and concisely.`;
-
-      // Call your local TinyLlama API with generation parameters to limit answer length
-      const response = await fetch('/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gpt2-large',
-          messages: [{ role: 'user', content: combinedPrompt }],
-          n_predict: 50,
-          temperature: 0.8,
-          top_k: 40,
-          top_p: 0.95,
-          repeat_penalty: 1.1
-        }),
+      const response = await fetch("https://librax-chatbot.puter.work/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: formattedMessages })
       });
 
-      if (!response.ok) {
-        throw new Error(`LM Studio API error: ${response.statusText}`);
-      }
-
       const data = await response.json();
-      const botReply = data.choices?.[0]?.message?.content || 'Sorry, no response.';
+      const botReply = data.reply || "No response from AI.";
 
       setMessages(prev => [
         ...prev,
-        { id: prev.length + 1, text: botReply, sender: 'bot' },
+        { id: Date.now() + "bot", text: botReply, sender: "bot" }
       ]);
-    } catch (error: any) {
-      console.error(error);
+    } catch (err: any) {
       setMessages(prev => [
         ...prev,
-        { id: prev.length + 1, text: 'Error fetching data from APIs or AI service.', sender: 'bot' },
+        { id: Date.now() + "err", text: "Error: " + (err.message || "Failed to get AI response"), sender: "bot" }
       ]);
     } finally {
-      setIsTyping(false); // hide typing animation
+      setIsTyping(false);
+      stopTypingAnimation();
     }
   };
 
   return (
     <div className={styles.chatbotContainer}>
-      {/* Header with collapse toggle */}
       <div className={styles.header} onClick={() => setOpen(o => !o)}>
-        <span>LibraX <b>ChatBot</b></span>
-        <span className={styles.arrow}>{open ? '▼' : '▲'}</span>
+        <b>LibraX Chatbot</b>
+        <span>{open ? "▼" : "▲"}</span>
       </div>
+
       {open && (
         <div className={styles.chatBody}>
           <div className={styles.messagesArea}>
             {messages.map(msg => (
-              <div
-                key={msg.id}
-                className={msg.sender === 'user' ? styles.userBubble : styles.botBubble}
-              >
-                {msg.text}
-              </div>
+              msg.sender === "user" ? (
+                <div key={msg.id} className={styles.userBubble}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.text}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <div key={msg.id} className={styles.botBubble}>
+                  <div className={styles.botBubbleContent}>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {msg.text}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              )
             ))}
+
             {isTyping && (
               <div className={styles.botBubble}>
-                <span className={styles.typing}>
-                  <span>.</span><span>.</span><span>.</span>
-                </span>
+                <span className={styles.typing}>{typingText}</span>
               </div>
             )}
+
+            <div ref={msgEndRef} />
           </div>
+
           <div className={styles.inputArea}>
-            <input
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              placeholder="Ask about books"
+            <textarea
+              ref={textAreaRef}
+              rows={1}
               className={styles.inputBox}
-              onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
+              placeholder="Ask about book titles, authors, or release dates..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
             />
-            <button className={styles.sendBtn} onClick={handleSend}>
-              Ask about books
+
+            <button
+              className={styles.sendBtn}
+              onClick={sendMessage}
+              disabled={!input.trim()}
+            >
+              <Send size={20} strokeWidth={2.5} />
             </button>
           </div>
         </div>

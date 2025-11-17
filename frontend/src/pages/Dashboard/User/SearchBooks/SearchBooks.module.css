@@ -58,9 +58,18 @@
   outline: none;
 }
 
-.searchInput {
+/* Search Input Wrapper with Clear Button */
+.searchInputWrapper {
   flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
   padding: 0.875rem 1.25rem;
+  padding-right: 2.75rem; /* Make room for clear button */
   border: 1px solid #ccc;
   border-radius: 0.75rem;
   font-size: 1.125rem;
@@ -70,6 +79,31 @@
 
 .searchInput:focus {
   border-color: #7d2e2e;
+}
+
+/* Clear Button (X icon) */
+.clearBtn {
+  position: absolute;
+  right: 0.625rem;
+  background: transparent;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.clearBtn:hover {
+  background: #f0f0f0;
+  color: #7d2e2e;
+}
+
+.clearBtn:active {
+  background: #e0e0e0;
 }
 
 .searchBtn {
@@ -417,6 +451,7 @@
     padding: 1.25rem;
   }
   
+  .searchInputWrapper,
   .searchInput,
   .searchDropdown,
   .searchBtn {
@@ -451,6 +486,16 @@
   
   .searchHint {
     font-size: 1rem;
+  }
+
+  .searchInput {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    padding-right: 2.5rem;
+  }
+
+  .clearBtn {
+    right: 0.5rem;
   }
   
   .modal {

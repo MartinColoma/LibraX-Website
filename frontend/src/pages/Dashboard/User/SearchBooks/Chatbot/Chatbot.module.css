@@ -1,6 +1,8 @@
 .chatbotContainer {
   width: 500px;
-  border: 2px solid #842f31;    /* Accent color */
+  max-height: 70vh;
+  height: auto;
+  border: 2px solid #842f31;
   border-radius: 12px;
   position: fixed;
   bottom: 20px;
@@ -26,35 +28,33 @@
   border-bottom: 3px solid #842f31;
   cursor: pointer;
   user-select: none;
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-}
-
-.arrow {
-  font-size: 1.3em;
+  flex-shrink: 0;
 }
 
 .chatBody {
   display: flex;
   flex-direction: column;
-  height: 700px;
+  flex: 1;
   background: #fefefe;
   padding: 16px 12px;
-  flex: 1;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .messagesArea {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding: 8px 12px;
   margin-bottom: 6px;
   scroll-behavior: smooth;
+  min-height: 0;
+  height: 100%;
 }
 
-/* Bubble styles */
 .botBubble {
   align-self: flex-start;
   background: #fff;
@@ -63,8 +63,16 @@
   padding: 10px 18px;
   font-size: 1rem;
   color: #222;
-  max-width: 80%;
+  max-width: 95%;
   box-shadow: 0 2px 7px rgba(50, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.botBubbleContent {
+  overflow: visible;
+  width: 100%;
 }
 
 .userBubble {
@@ -77,19 +85,22 @@
   color: #123;
   max-width: 80%;
   box-shadow: 0 2px 7px rgba(84, 177, 255, 0.3);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
+/* Input area */
 .inputArea {
   display: flex;
+  align-items: flex-end;
   border-top: 2px solid #842f31;
   padding-top: 10px;
   gap: 8px;
-  align-items: center;
   background-color: #fafafa;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
+  flex-shrink: 0;
 }
 
+/* Dynamic textarea */
 .inputBox {
   flex: 1;
   font-size: 1.1rem;
@@ -97,7 +108,10 @@
   border-radius: 10px;
   padding: 10px 14px;
   outline: none;
-  transition: border-color 0.2s ease;
+  resize: none;
+  overflow-y: auto;
+  max-height: 100px;
+  line-height: 1.3rem;
 }
 
 .inputBox:focus {
@@ -120,40 +134,470 @@
   background: #a03b3c;
 }
 
-/* Typing animation */
+.sendBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
 .typing {
-  display: inline-flex;
-  gap: 4px;
+  display: inline-block;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: #842f31;
+}
+
+/* Markdown styling inside bot bubbles only */
+.markdown {
+  font-size: 1rem;
+  line-height: 1.5;
+  width: 100%;
+}
+
+.markdown p {
+  margin: 0 0 10px 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown strong {
   font-weight: 700;
-  font-size: 1.3rem;
+  color: #220000;
+}
+
+.markdown em {
+  font-style: italic;
+}
+
+/* Headings */
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  margin: 12px 0 8px;
   color: #320000;
+  font-weight: 700;
 }
 
-.typing span {
-  animation-name: blink;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-duration: 1.4s;
+.markdown h1:first-child,
+.markdown h2:first-child,
+.markdown h3:first-child {
+  margin-top: 0;
 }
 
-.typing span:nth-child(1) {
-  animation-delay: 0s;
-}
-.typing span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.typing span:nth-child(3) {
-  animation-delay: 0.4s;
+.markdown h1 { font-size: 1.35rem; }
+.markdown h2 { font-size: 1.2rem; }
+.markdown h3 { font-size: 1.1rem; }
+
+/* Lists */
+.markdown ul,
+.markdown ol {
+  margin-left: 20px;
+  margin-bottom: 10px;
 }
 
-@keyframes blink {
-  0%, 20% {
-    opacity: 0.2;
+.markdown li {
+  margin-bottom: 4px;
+}
+
+/* Inline code */
+.markdown code {
+  background: #f3f1f1;
+  padding: 2px 5px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #842f31;
+  border: 1px solid #ddd;
+  word-break: break-word;
+}
+
+/* Code block */
+.markdown pre {
+  background: #1e1e1e;
+  color: #e2e2e2;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #00000020;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre;
+}
+
+.markdown pre code {
+  background: none;
+  padding: 0;
+  border: none;
+  word-break: normal;
+  white-space: pre;
+  display: block;
+}
+
+/* Links */
+.markdown a {
+  color: #842f31;
+  text-decoration: underline;
+  word-break: break-word;
+}
+
+.markdown a:hover {
+  color: #a64143;
+}
+
+/* Tables - Fixed for better readability */
+.markdown table {
+  border-collapse: collapse;
+  margin-bottom: 12px;
+  width: 100%;
+  display: block;
+  overflow-x: auto;
+  font-size: 0.95rem;
+  max-width: 100%;
+}
+
+.markdown thead,
+.markdown tbody {
+  display: table;
+  width: 100%;
+  table-layout: auto;
+}
+
+.markdown tr {
+  display: table-row;
+}
+
+.markdown th,
+.markdown td {
+  display: table-cell;
+  border: 2px solid #d4a5a5;
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-width: 100px;
+  line-height: 1.4;
+}
+
+.markdown th {
+  background: #842f31;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-color: #6b2525;
+}
+
+.markdown td {
+  max-width: 250px;
+  background: #ffffff;
+}
+
+.markdown tbody tr:nth-child(even) td {
+  background: #fef5f5;
+}
+
+.markdown tbody tr:hover td {
+  background: #fde8e8;
+}
+
+/* Custom scrollbar for messages area */
+.messagesArea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messagesArea::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.messagesArea::-webkit-scrollbar-thumb {
+  background: #842f31;
+  border-radius: 4px;
+}
+
+.messagesArea::-webkit-scrollbar-thumb:hover {
+  background: #6b2525;
+}
+
+/* Custom scrollbar for bot bubble content (horizontal scroll) */
+.botBubbleContent::-webkit-scrollbar {
+  height: 4px;
+}
+
+.botBubbleContent::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.botBubbleContent::-webkit-scrollbar-thumb {
+  background: #842f31;
+  border-radius: 4px;
+}
+
+.botBubbleContent::-webkit-scrollbar-thumb:hover {
+  background: #6b2525;
+}
+
+/* Scrollbar for tables */
+.markdown table::-webkit-scrollbar {
+  height: 8px;
+}
+
+.markdown table::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.markdown table::-webkit-scrollbar-thumb {
+  background: #842f31;
+  border-radius: 4px;
+}
+
+.markdown table::-webkit-scrollbar-thumb:hover {
+  background: #6b2525;
+}
+
+/* Scrollbar for code blocks (vertical only) */
+.markdown pre::-webkit-scrollbar {
+  width: 8px;
+}
+
+.markdown pre::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.markdown pre::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.markdown pre::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE STYLES
+   ======================================== */
+
+/* Tablets and smaller laptops (1024px and below) */
+@media (max-width: 1024px) {
+  .chatbotContainer {
+    width: 450px;
+    right: 20px;
+    bottom: 15px;
   }
-  50% {
-    opacity: 1;
+
+  .header {
+    font-size: 1.05rem;
+    padding: 10px 16px;
   }
-  100% {
-    opacity: 0.2;
+
+  .inputBox {
+    font-size: 1rem;
+    padding: 9px 12px;
+  }
+
+  .sendBtn {
+    padding: 9px 16px;
+    font-size: 1rem;
+  }
+}
+
+/* Mobile devices (768px and below) */
+@media (max-width: 768px) {
+  .chatbotContainer {
+    width: calc(100vw - 32px);
+    max-width: 420px;
+    right: 16px;
+    bottom: 12px;
+    max-height: 65vh;
+  }
+
+  .header {
+    font-size: 1rem;
+    padding: 10px 14px;
+  }
+
+  .chatBody {
+    padding: 12px 10px;
+  }
+
+  .messagesArea {
+    padding: 6px 8px;
+    gap: 12px;
+  }
+
+  .botBubble,
+  .userBubble {
+    max-width: 85%;
+    padding: 9px 14px;
+    font-size: 0.95rem;
+  }
+
+  .inputBox {
+    font-size: 0.95rem;
+    padding: 8px 12px;
+    max-height: 90px;
+  }
+
+  .sendBtn {
+    padding: 8px 14px;
+  }
+
+  .markdown {
+    font-size: 0.95rem;
+  }
+
+  .markdown h1 { font-size: 1.2rem; }
+  .markdown h2 { font-size: 1.1rem; }
+  .markdown h3 { font-size: 1rem; }
+
+  .markdown th,
+  .markdown td {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    min-width: 80px;
+  }
+
+  .markdown td {
+    max-width: 200px;
+  }
+}
+
+/* Small mobile devices (480px and below) */
+@media (max-width: 480px) {
+  .chatbotContainer {
+    width: calc(100vw - 20px);
+    right: 10px;
+    bottom: 10px;
+    max-height: 60vh;
+    border-radius: 10px;
+  }
+
+  .header {
+    font-size: 0.95rem;
+    padding: 9px 12px;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .chatBody {
+    padding: 10px 8px;
+  }
+
+  .messagesArea {
+    padding: 4px 6px;
+    gap: 10px;
+  }
+
+  .botBubble,
+  .userBubble {
+    max-width: 90%;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 14px;
+  }
+
+  .inputArea {
+    padding-top: 8px;
+    gap: 6px;
+  }
+
+  .inputBox {
+    font-size: 0.9rem;
+    padding: 7px 10px;
+    max-height: 80px;
+    line-height: 1.2rem;
+    border-radius: 8px;
+  }
+
+  .sendBtn {
+    padding: 7px 12px;
+    border-radius: 8px;
+  }
+
+  .markdown {
+    font-size: 0.9rem;
+  }
+
+  .markdown h1 { font-size: 1.1rem; }
+  .markdown h2 { font-size: 1rem; }
+  .markdown h3 { font-size: 0.95rem; }
+
+  .markdown code {
+    font-size: 0.85rem;
+    padding: 1px 4px;
+  }
+
+  .markdown pre {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .markdown th,
+  .markdown td {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    min-width: 70px;
+  }
+
+  .markdown td {
+    max-width: 150px;
+  }
+}
+
+/* Extra small devices (360px and below) */
+@media (max-width: 360px) {
+  .chatbotContainer {
+    width: calc(100vw - 16px);
+    right: 8px;
+    bottom: 8px;
+    max-height: 55vh;
+  }
+
+  .header {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+
+  .chatBody {
+    padding: 8px 6px;
+  }
+
+  .botBubble,
+  .userBubble {
+    padding: 7px 10px;
+    font-size: 0.85rem;
+  }
+
+  .inputBox {
+    font-size: 0.85rem;
+    padding: 6px 9px;
+  }
+
+  .sendBtn {
+    padding: 6px 10px;
+  }
+
+  .typing {
+    font-size: 0.85rem;
+  }
+
+  .markdown th,
+  .markdown td {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    min-width: 60px;
+  }
+
+  .markdown td {
+    max-width: 120px;
   }
 }

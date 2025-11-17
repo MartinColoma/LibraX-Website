@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import styles from './SearchBooks.module.css';
 import axios from 'axios';
 import usePageMeta from "../../../../hooks/usePageMeta";
 import Sidebar from "../Sidebar/Sidebar";
+import Chatbot from './/Chatbot/Chatbot';
 
 interface Book {
   book_id: string;
@@ -107,6 +108,15 @@ export default function OPAC() {
     setDebounceTimer(timer);
   };
 
+  const clearSearch = () => {
+    setQuery('');
+    setResults([]);
+    setSearched(false);
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+  };
+
   // Open request modal
   const openRequestModal = (book: Book) => {
     setSelectedBook(book);
@@ -129,53 +139,53 @@ export default function OPAC() {
   };
 
   // Submit book request with password verification
-const handleRequestSubmit = async () => {
-  if (!passwordInput || !selectedBook) return;
+  const handleRequestSubmit = async () => {
+    if (!passwordInput || !selectedBook) return;
 
-  const userId = sessionStorage.getItem('user_id');
-  if (!userId) {
-    setPasswordError('User not logged in. Please login again.');
-    return;
-  }
+    const userId = sessionStorage.getItem('user_id');
+    if (!userId) {
+      setPasswordError('User not logged in. Please login again.');
+      return;
+    }
 
-  setIsSubmitting(true);
-  setPasswordError('');
+    setIsSubmitting(true);
+    setPasswordError('');
 
-  try {
-    // ✅ Correct verify-password endpoint
-    const verifyResp = await axios.post(`${API_BASE_URL}/verify-password`, {
-      user_id: userId,
-      password: passwordInput,
-    });
-
-    if (verifyResp.data.success) {
-      // Password verified, now submit book request
-      const requestResp = await axios.post(`${API_BASE_URL}/books/request`, {
+    try {
+      // ✅ Correct verify-password endpoint
+      const verifyResp = await axios.post(`${API_BASE_URL}/verify-password`, {
         user_id: userId,
-        book_id: selectedBook.book_id,
+        password: passwordInput,
       });
 
-      if (requestResp.data.success) {
-        setRequestSuccess(true);
-        setTimeout(() => {
-          closeRequestModal();
-          if (query) performSearch(query); // Refresh search results
-        }, 2000);
-      } else {
-        setPasswordError(requestResp.data.message || 'Failed to submit request');
+      if (verifyResp.data.success) {
+        // Password verified, now submit book request
+        const requestResp = await axios.post(`${API_BASE_URL}/books/request`, {
+          user_id: userId,
+          book_id: selectedBook.book_id,
+        });
+
+        if (requestResp.data.success) {
+          setRequestSuccess(true);
+          setTimeout(() => {
+            closeRequestModal();
+            if (query) performSearch(query); // Refresh search results
+          }, 2000);
+        } else {
+          setPasswordError(requestResp.data.message || 'Failed to submit request');
+        }
       }
+    } catch (error: any) {
+      console.error('Request error:', error);
+      if (error.response && error.response.status === 401) {
+        setPasswordError('Incorrect password. Please try again.');
+      } else {
+        setPasswordError('Failed to submit request. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-  } catch (error: any) {
-    console.error('Request error:', error);
-    if (error.response && error.response.status === 401) {
-      setPasswordError('Incorrect password. Please try again.');
-    } else {
-      setPasswordError('Failed to submit request. Please try again.');
-    }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   return (
     <div className="page-layout">
@@ -211,13 +221,25 @@ const handleRequestSubmit = async () => {
                 ))}
               </select>
 
-              <input
-                className={styles.searchInput}
-                type="text"
-                placeholder="Search Library Catalog"
-                value={query}
-                onChange={handleSearch}
-              />
+              <div className={styles.searchInputWrapper}>
+                <input
+                  className={styles.searchInput}
+                  type="text"
+                  placeholder="Search Library Catalog"
+                  value={query}
+                  onChange={handleSearch}
+                />
+                {query && (
+                  <button
+                    className={styles.clearBtn}
+                    onClick={clearSearch}
+                    aria-label="Clear search"
+                    type="button"
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
 
               <button
                 className={styles.searchBtn}
@@ -395,6 +417,7 @@ const handleRequestSubmit = async () => {
             </div>
           )}
         </div>
+      <Chatbot />
       </main>
     </div>
   );
